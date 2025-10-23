@@ -7,6 +7,7 @@ from mcp.server import Server
 from mcp.server.stdio import stdio_server
 from mcp.types import TextContent, Tool
 
+from gtd_mcp.completer import ProjectCompleter
 from gtd_mcp.config import ConfigManager
 from gtd_mcp.creator import ProjectCreator
 from gtd_mcp.lister import ProjectLister
@@ -94,6 +95,38 @@ def list_active_projects_handler(params: dict, config_path: str | None = None) -
         return f"Error: {str(e)}"
 
 
+def complete_project_handler(params: dict, config_path: str | None = None) -> str:
+    """
+    Handle complete_project tool invocation.
+
+    Args:
+        params: Tool parameters (title)
+        config_path: Optional path to config file (for testing)
+
+    Returns:
+        Success or error message
+    """
+    try:
+        # Load configuration
+        config = ConfigManager(config_path)
+
+        # Extract parameters
+        title = params.get("title")
+
+        # Validate required parameters
+        if not title:
+            return "Error: Missing required parameter (title)"
+
+        # Initialize completer
+        completer = ProjectCompleter(config)
+
+        # Complete project
+        return completer.complete_project(title)
+
+    except Exception as e:
+        return f"Error: {str(e)}"
+
+
 async def main():
     """Run the MCP server."""
     server = Server("gtd-mcp")
@@ -148,6 +181,20 @@ async def main():
                     "properties": {},
                     "required": []
                 }
+            ),
+            Tool(
+                name="complete_project",
+                description="Complete an active GTD project by moving it to the completed folder after validating all 0k work is done",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "title": {
+                            "type": "string",
+                            "description": "Project title (exact match, case-sensitive)"
+                        }
+                    },
+                    "required": ["title"]
+                }
             )
         ]
 
@@ -159,6 +206,9 @@ async def main():
             return [TextContent(type="text", text=result)]
         elif name == "list_active_projects":
             result = list_active_projects_handler(arguments, config_path)
+            return [TextContent(type="text", text=result)]
+        elif name == "complete_project":
+            result = complete_project_handler(arguments, config_path)
             return [TextContent(type="text", text=result)]
         else:
             raise ValueError(f"Unknown tool: {name}")
