@@ -92,13 +92,13 @@
 
 ### Task: Commit Duplicate Detection
 
-*   [ ] **Description:** Commit duplicate detection implementation
+*   [x] **Description:** Commit duplicate detection implementation
 *   **Commit Message:** `feat: implement duplicate detection across all project folders`
 *   **Dependencies:** Task 2.5
 
 ### Task: Write Unit Tests for Due Date Validation
 
-*   [ ] **Description:** Create unit tests for `ProjectValidator.validate_due_date()` covering:
+*   [x] **Description:** Create unit tests for `ProjectValidator.validate_due_date()` covering:
     *   Valid YYYY-MM-DD format
     *   Invalid formats (YYYY/MM/DD, MM-DD-YYYY, etc.)
     *   None/empty values

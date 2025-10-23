@@ -324,3 +324,133 @@ class TestProjectValidatorCheckDuplicates:
         # Then
         assert is_duplicate is False
         assert folder_name is None
+
+
+class TestProjectValidatorValidateDueDate:
+    """Test ProjectValidator.validate_due_date()."""
+
+    def test_valid_due_date(self, tmp_path):
+        """
+        Test validating correct YYYY-MM-DD format.
+
+        Given: ProjectValidator instance
+        When: Calling validate_due_date("2025-12-31")
+        Then: Returns (True, None)
+        """
+        # Given
+        config_file = tmp_path / "config.json"
+        config_data = {
+            "gtd_repo_path": "/path/to/repo",
+            "areas": [{"name": "Health", "kebab": "health"}],
+        }
+        config_file.write_text(json.dumps(config_data))
+        config = ConfigManager(str(config_file))
+        validator = ProjectValidator(config)
+
+        # When
+        is_valid, error_msg = validator.validate_due_date("2025-12-31")
+
+        # Then
+        assert is_valid is True
+        assert error_msg is None
+
+    def test_invalid_date_format_slashes(self, tmp_path):
+        """
+        Test rejecting YYYY/MM/DD format.
+
+        Given: ProjectValidator instance
+        When: Calling validate_due_date("2025/12/31")
+        Then: Returns (False, error message)
+        """
+        # Given
+        config_file = tmp_path / "config.json"
+        config_data = {
+            "gtd_repo_path": "/path/to/repo",
+            "areas": [{"name": "Health", "kebab": "health"}],
+        }
+        config_file.write_text(json.dumps(config_data))
+        config = ConfigManager(str(config_file))
+        validator = ProjectValidator(config)
+
+        # When
+        is_valid, error_msg = validator.validate_due_date("2025/12/31")
+
+        # Then
+        assert is_valid is False
+        assert error_msg is not None
+        assert "YYYY-MM-DD" in error_msg
+
+    def test_invalid_date_format_american(self, tmp_path):
+        """
+        Test rejecting MM-DD-YYYY format.
+
+        Given: ProjectValidator instance
+        When: Calling validate_due_date("12-31-2025")
+        Then: Returns (False, error message)
+        """
+        # Given
+        config_file = tmp_path / "config.json"
+        config_data = {
+            "gtd_repo_path": "/path/to/repo",
+            "areas": [{"name": "Health", "kebab": "health"}],
+        }
+        config_file.write_text(json.dumps(config_data))
+        config = ConfigManager(str(config_file))
+        validator = ProjectValidator(config)
+
+        # When
+        is_valid, error_msg = validator.validate_due_date("12-31-2025")
+
+        # Then
+        assert is_valid is False
+        assert error_msg is not None
+
+    def test_empty_string_is_invalid(self, tmp_path):
+        """
+        Test rejecting empty string.
+
+        Given: ProjectValidator instance
+        When: Calling validate_due_date("")
+        Then: Returns (False, error message)
+        """
+        # Given
+        config_file = tmp_path / "config.json"
+        config_data = {
+            "gtd_repo_path": "/path/to/repo",
+            "areas": [{"name": "Health", "kebab": "health"}],
+        }
+        config_file.write_text(json.dumps(config_data))
+        config = ConfigManager(str(config_file))
+        validator = ProjectValidator(config)
+
+        # When
+        is_valid, error_msg = validator.validate_due_date("")
+
+        # Then
+        assert is_valid is False
+        assert error_msg is not None
+
+    def test_invalid_date_values(self, tmp_path):
+        """
+        Test rejecting invalid date values.
+
+        Given: ProjectValidator instance
+        When: Calling validate_due_date("2025-13-45")
+        Then: Returns (False, error message)
+        """
+        # Given
+        config_file = tmp_path / "config.json"
+        config_data = {
+            "gtd_repo_path": "/path/to/repo",
+            "areas": [{"name": "Health", "kebab": "health"}],
+        }
+        config_file.write_text(json.dumps(config_data))
+        config = ConfigManager(str(config_file))
+        validator = ProjectValidator(config)
+
+        # When
+        is_valid, error_msg = validator.validate_due_date("2025-13-45")
+
+        # Then
+        assert is_valid is False
+        assert error_msg is not None
