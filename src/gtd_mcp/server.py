@@ -9,6 +9,7 @@ from mcp.types import TextContent, Tool
 
 from gtd_mcp.config import ConfigManager
 from gtd_mcp.creator import ProjectCreator
+from gtd_mcp.lister import ProjectLister
 from gtd_mcp.validator import ProjectValidator
 
 
@@ -68,6 +69,31 @@ def create_project_handler(params: dict, config_path: str | None = None) -> str:
         return f"Error: {str(e)}"
 
 
+def list_active_projects_handler(params: dict, config_path: str | None = None) -> str:
+    """
+    Handle list_active_projects tool invocation.
+
+    Args:
+        params: Tool parameters (currently none)
+        config_path: Optional path to config file (for testing)
+
+    Returns:
+        Formatted list of active projects grouped by area
+    """
+    try:
+        # Load configuration
+        config = ConfigManager(config_path)
+
+        # Initialize lister
+        lister = ProjectLister(config)
+
+        # List active projects
+        return lister.list_active_projects()
+
+    except Exception as e:
+        return f"Error: {str(e)}"
+
+
 async def main():
     """Run the MCP server."""
     server = Server("gtd-mcp")
@@ -113,6 +139,15 @@ async def main():
                     },
                     "required": ["title", "area", "type", "folder"]
                 }
+            ),
+            Tool(
+                name="list_active_projects",
+                description="List all active GTD projects grouped by area of focus with due dates and type indicators",
+                inputSchema={
+                    "type": "object",
+                    "properties": {},
+                    "required": []
+                }
             )
         ]
 
@@ -121,6 +156,9 @@ async def main():
         """Handle tool calls."""
         if name == "create_project":
             result = create_project_handler(arguments, config_path)
+            return [TextContent(type="text", text=result)]
+        elif name == "list_active_projects":
+            result = list_active_projects_handler(arguments, config_path)
             return [TextContent(type="text", text=result)]
         else:
             raise ValueError(f"Unknown tool: {name}")
