@@ -226,7 +226,7 @@ class TestProjectCreatorGenerateFrontmatter:
 
         # Then
         frontmatter = yaml.safe_load(result.strip("---\n"))
-        assert frontmatter["due"] == "2025-12-31"
+        assert str(frontmatter["due"]) == "2025-12-31"
 
     def test_excludes_due_when_not_provided(self, tmp_path):
         """
