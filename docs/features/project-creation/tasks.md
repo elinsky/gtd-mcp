@@ -30,7 +30,7 @@
 
 ### Task: Implement ConfigManager
 
-*   [ ] **Description:** Implement `ConfigManager` class with methods:
+*   [x] **Description:** Implement `ConfigManager` class with methods:
     *   `__init__(config_path: str | None = None)`
     *   `get_repo_path() -> str`
     *   `get_areas() -> list[dict[str, str]]`
