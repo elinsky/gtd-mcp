@@ -161,3 +161,73 @@ class ProjectCompleter:
                 continue
 
         return blockers
+
+    def parse_frontmatter(self, file_path: Path) -> dict:
+        """
+        Parse YAML frontmatter from a project file.
+
+        Args:
+            file_path: Path to project markdown file
+
+        Returns:
+            Dict with frontmatter fields (preserves insertion order)
+        """
+        with open(file_path, 'r') as f:
+            content = f.read()
+
+        # Extract frontmatter between --- markers
+        parts = content.split("---", 2)
+        if len(parts) < 3:
+            raise ValueError("Invalid frontmatter format")
+
+        yaml_content = parts[1]
+        frontmatter = yaml.safe_load(yaml_content)
+
+        # Convert date objects to strings
+        for key, value in frontmatter.items():
+            if isinstance(value, date):
+                frontmatter[key] = str(value)
+
+        return frontmatter
+
+    def add_completed_date(self, frontmatter: dict) -> dict:
+        """
+        Add completed date to frontmatter dict.
+
+        Maintains field order: area, title, type, created, started,
+        last_reviewed, due (if present), completed.
+
+        Args:
+            frontmatter: Existing frontmatter dict
+
+        Returns:
+            New dict with completed date added
+        """
+        result = {}
+        completed_value = str(date.today())
+
+        # Build in correct order
+        for key in ["area", "title", "type", "created", "started", "last_reviewed", "due"]:
+            if key in frontmatter:
+                result[key] = frontmatter[key]
+
+        # Add completed at the end
+        result["completed"] = completed_value
+
+        return result
+
+    def generate_frontmatter_yaml(self, frontmatter: dict) -> str:
+        """
+        Generate YAML frontmatter string from dict.
+
+        Args:
+            frontmatter: Frontmatter dict
+
+        Returns:
+            YAML frontmatter string with --- delimiters
+        """
+        lines = ["---"]
+        for key, value in frontmatter.items():
+            lines.append(f"{key}: {value}")
+        lines.append("---")
+        return "\n".join(lines) + "\n"
