@@ -1,5 +1,7 @@
 """Validation logic for GTD project creation."""
 
+import re
+from datetime import datetime
 from pathlib import Path
 
 from gtd_mcp.config import ConfigManager
@@ -71,3 +73,29 @@ class ProjectValidator:
                 return (True, folder)
 
         return (False, None)
+
+    def validate_due_date(self, due: str) -> tuple[bool, str | None]:
+        """
+        Validate due date format.
+
+        Args:
+            due: Due date string to validate
+
+        Returns:
+            Tuple of (is_valid, error_message)
+            - If valid: (True, None)
+            - If invalid: (False, error message)
+        """
+        if not due:
+            return (False, "Due date cannot be empty")
+
+        # Check format matches YYYY-MM-DD
+        if not re.match(r'^\d{4}-\d{2}-\d{2}$', due):
+            return (False, f"Invalid due date format. Expected YYYY-MM-DD, got '{due}'")
+
+        # Validate it's an actual valid date
+        try:
+            datetime.strptime(due, "%Y-%m-%d")
+            return (True, None)
+        except ValueError:
+            return (False, f"Invalid date values in '{due}'. Must be a valid calendar date")

@@ -108,14 +108,14 @@
 
 ### Task: Implement Due Date Validation
 
-*   [ ] **Description:** Implement `ProjectValidator.validate_due_date()` method
+*   [x] **Description:** Implement `ProjectValidator.validate_due_date()` method
 *   **Location:** `src/gtd_mcp/validator.py`
 *   **Expected Outcome:** All tests from Task 2.7 pass
 *   **Dependencies:** Task 2.7
 
 ### Task: Commit Due Date Validation
 
-*   [ ] **Description:** Commit due date validation implementation
+*   [x] **Description:** Commit due date validation implementation
 *   **Commit Message:** `feat: implement due date validation for YYYY-MM-DD format`
 *   **Dependencies:** Task 2.8
 
