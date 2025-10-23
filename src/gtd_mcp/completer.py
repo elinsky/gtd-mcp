@@ -109,3 +109,55 @@ class ProjectCompleter:
                         continue
 
         return (None, f"Project '{title}' not found in active folder")
+
+    def check_0k_blockers(self, project_kebab: str) -> list[dict]:
+        """
+        Check for open 0k horizon items tagged with the project.
+
+        Scans @waiting.md, @incubating.md, @deferred.md, and contexts/*.md
+        for unchecked items (- [ ]) containing +{project_kebab}. Ignores
+        completed.md file and checked items (- [x]).
+
+        Args:
+            project_kebab: Project identifier in kebab-case
+
+        Returns:
+            List of dicts with keys "file" and "line" for each blocking item
+        """
+        repo_path = Path(self._config.get_repo_path())
+        next_actions_base = repo_path / "docs" / "execution_system" / "00k-next-actions"
+
+        blockers = []
+        project_tag = f"+{project_kebab}"
+
+        # Files to check (excluding completed.md)
+        files_to_check = []
+
+        # Add @ files
+        for filename in ["@waiting.md", "@incubating.md", "@deferred.md"]:
+            file_path = next_actions_base / filename
+            if file_path.exists():
+                files_to_check.append((filename, file_path))
+
+        # Add context files
+        contexts_dir = next_actions_base / "contexts"
+        if contexts_dir.exists():
+            for context_file in contexts_dir.glob("*.md"):
+                relative_name = f"contexts/{context_file.name}"
+                files_to_check.append((relative_name, context_file))
+
+        # Scan each file for unchecked items with project tag
+        for filename, file_path in files_to_check:
+            try:
+                with open(file_path, 'r') as f:
+                    for line in f:
+                        # Only match unchecked items
+                        if line.strip().startswith("- [ ]") and project_tag in line:
+                            blockers.append({
+                                "file": filename,
+                                "line": line.strip()
+                            })
+            except Exception:
+                continue
+
+        return blockers
