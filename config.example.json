@@ -1,0 +1,16 @@
+{
+  "gtd_repo_path": "/absolute/path/to/your/gtd-repo",
+  "areas": [
+    {"name": "Health", "kebab": "health"},
+    {"name": "Learning", "kebab": "learning"},
+    {"name": "Career", "kebab": "career"},
+    {"name": "Mission", "kebab": "mission"},
+    {"name": "Personal Growth Systems", "kebab": "personal-growth-systems"},
+    {"name": "Social Relationships", "kebab": "social-relationships"},
+    {"name": "Romance", "kebab": "romance"},
+    {"name": "Emotional Health", "kebab": "emotional-health"},
+    {"name": "Finance", "kebab": "finance"},
+    {"name": "Character and Values", "kebab": "character-and-values"},
+    {"name": "Hobbies and Recreation", "kebab": "hobbies-and-recreation"}
+  ]
+}
