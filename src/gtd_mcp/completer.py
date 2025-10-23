@@ -231,3 +231,82 @@ class ProjectCompleter:
             lines.append(f"{key}: {value}")
         lines.append("---")
         return "\n".join(lines) + "\n"
+
+    def complete_project(self, title: str) -> str:
+        """
+        Complete a GTD project.
+
+        Validates no open 0k items exist, then moves project from active/
+        to completed/ folder with completed date added to frontmatter.
+
+        Args:
+            title: Project title
+
+        Returns:
+            Success or error message
+        """
+        # Find active project
+        project_path, area_or_error = self.find_active_project(title)
+        if project_path is None:
+            return f"✗ Error: {area_or_error}"
+
+        area_kebab = area_or_error
+        project_kebab = project_path.stem
+
+        # Check for 0k blockers
+        blockers = self.check_0k_blockers(project_kebab)
+        if blockers:
+            error_lines = [f"✗ Cannot complete project '{title}' - {len(blockers)} open item(s) at 0k horizon:", ""]
+
+            # Group by file
+            by_file = {}
+            for blocker in blockers:
+                file = blocker["file"]
+                if file not in by_file:
+                    by_file[file] = []
+                by_file[file].append(blocker["line"])
+
+            for file, lines in by_file.items():
+                file_display = file.replace("@", "").replace(".md", "").replace("contexts/", "").title()
+                error_lines.append(f"{file_display} ({file}):")
+                for line in lines:
+                    # Extract just the description part
+                    parts = line.split(" ", 3)
+                    if len(parts) >= 4:
+                        desc = parts[3].split(" +")[0]
+                        error_lines.append(f"  • {desc}")
+                error_lines.append("")
+
+            error_lines.append("Complete or remove these items before completing the project.")
+            return "\n".join(error_lines)
+
+        # Parse existing frontmatter
+        frontmatter = self.parse_frontmatter(project_path)
+
+        # Add completed date
+        frontmatter = self.add_completed_date(frontmatter)
+
+        # Read project body (everything after frontmatter)
+        with open(project_path, 'r') as f:
+            content = f.read()
+        parts = content.split("---", 2)
+        body = parts[2] if len(parts) >= 3 else ""
+
+        # Generate new frontmatter
+        new_frontmatter = self.generate_frontmatter_yaml(frontmatter)
+
+        # Create completed directory if needed
+        repo_path = Path(self._config.get_repo_path())
+        completed_base = repo_path / "docs" / "execution_system" / "10k-projects" / "completed"
+        completed_area_dir = completed_base / area_kebab
+        completed_area_dir.mkdir(parents=True, exist_ok=True)
+
+        # Write to completed folder
+        completed_path = completed_area_dir / project_path.name
+        with open(completed_path, 'w') as f:
+            f.write(new_frontmatter + body)
+
+        # Delete from active folder
+        project_path.unlink()
+
+        return f"✓ Successfully completed project '{title}'\n  Moved from: {project_path}\n  Moved to: {completed_path}\n  Completed: {date.today()}"

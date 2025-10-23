@@ -852,3 +852,169 @@ class TestProjectCompleterGenerateFrontmatterYaml:
         # Then
         assert "created: 2025-10-20" in result
         assert "completed: 2025-10-23" in result
+
+
+class TestProjectCompleterCompleteProject:
+    """Tests for ProjectCompleter.complete_project method."""
+
+    def test_successfully_completes_project_with_no_blockers(self, tmp_path):
+        """
+        Given an active project with no 0k blockers
+        When complete_project is called
+        Then the project is moved to completed with completed date added
+        """
+        # Given
+        config_file = tmp_path / "config.json"
+        config_file.write_text("""{
+            "gtd_repo_path": "%s",
+            "areas": [{"name": "Health", "kebab": "health"}]
+        }""" % str(tmp_path))
+
+        active_health = tmp_path / "docs/execution_system/10k-projects/active/health"
+        active_health.mkdir(parents=True)
+        project_file = active_health / "test-project.md"
+        project_file.write_text("""---
+area: Health
+title: Test Project
+type: standard
+created: 2025-10-20
+started: 2025-10-20
+last_reviewed: 2025-10-22
+---
+
+# Content here
+""")
+
+        next_actions_dir = tmp_path / "docs/execution_system/00k-next-actions"
+        next_actions_dir.mkdir(parents=True)
+        waiting_file = next_actions_dir / "@waiting.md"
+        waiting_file.write_text("---\ntitle: Waiting\n---\n\n- [ ] Something else +other-project\n")
+
+        config = ConfigManager(str(config_file))
+        completer = ProjectCompleter(config)
+
+        # When
+        result = completer.complete_project("Test Project")
+
+        # Then
+        completed_file = tmp_path / "docs/execution_system/10k-projects/completed/health/test-project.md"
+        assert completed_file.exists()
+        assert not project_file.exists()
+        assert "completed: " + str(date.today()) in completed_file.read_text()
+        assert "Successfully completed" in result
+
+    def test_creates_completed_subdirectory_if_missing(self, tmp_path):
+        """
+        Given the completed/health subdirectory doesn't exist
+        When complete_project is called
+        Then the directory is created
+        """
+        # Given
+        config_file = tmp_path / "config.json"
+        config_file.write_text("""{
+            "gtd_repo_path": "%s",
+            "areas": [{"name": "Health", "kebab": "health"}]
+        }""" % str(tmp_path))
+
+        active_health = tmp_path / "docs/execution_system/10k-projects/active/health"
+        active_health.mkdir(parents=True)
+        project_file = active_health / "test-project.md"
+        project_file.write_text("""---
+area: Health
+title: Test Project
+type: standard
+created: 2025-10-20
+started: 2025-10-20
+last_reviewed: 2025-10-22
+---
+
+# Content
+""")
+
+        next_actions_dir = tmp_path / "docs/execution_system/00k-next-actions"
+        next_actions_dir.mkdir(parents=True)
+
+        config = ConfigManager(str(config_file))
+        completer = ProjectCompleter(config)
+
+        # When
+        result = completer.complete_project("Test Project")
+
+        # Then
+        completed_health = tmp_path / "docs/execution_system/10k-projects/completed/health"
+        assert completed_health.exists()
+        assert completed_health.is_dir()
+
+    def test_returns_error_for_nonexistent_project(self, tmp_path):
+        """
+        Given no project exists with the title
+        When complete_project is called
+        Then an error message is returned
+        """
+        # Given
+        config_file = tmp_path / "config.json"
+        config_file.write_text("""{
+            "gtd_repo_path": "%s",
+            "areas": [{"name": "Health", "kebab": "health"}]
+        }""" % str(tmp_path))
+
+        active_health = tmp_path / "docs/execution_system/10k-projects/active/health"
+        active_health.mkdir(parents=True)
+
+        config = ConfigManager(str(config_file))
+        completer = ProjectCompleter(config)
+
+        # When
+        result = completer.complete_project("Nonexistent Project")
+
+        # Then
+        assert "not found" in result.lower()
+
+    def test_returns_error_with_blocking_items(self, tmp_path):
+        """
+        Given an active project with open 0k items
+        When complete_project is called
+        Then an error message listing blockers is returned
+        """
+        # Given
+        config_file = tmp_path / "config.json"
+        config_file.write_text("""{
+            "gtd_repo_path": "%s",
+            "areas": [{"name": "Health", "kebab": "health"}]
+        }""" % str(tmp_path))
+
+        active_health = tmp_path / "docs/execution_system/10k-projects/active/health"
+        active_health.mkdir(parents=True)
+        project_file = active_health / "test-project.md"
+        project_file.write_text("""---
+area: Health
+title: Test Project
+type: standard
+created: 2025-10-20
+started: 2025-10-20
+last_reviewed: 2025-10-22
+---
+
+# Content
+""")
+
+        next_actions_dir = tmp_path / "docs/execution_system/00k-next-actions"
+        next_actions_dir.mkdir(parents=True)
+        waiting_file = next_actions_dir / "@waiting.md"
+        waiting_file.write_text("""---
+title: Waiting
+---
+
+- [ ] 2025-10-22 Wait for something +test-project
+""")
+
+        config = ConfigManager(str(config_file))
+        completer = ProjectCompleter(config)
+
+        # When
+        result = completer.complete_project("Test Project")
+
+        # Then
+        assert "cannot complete" in result.lower() or "open items" in result.lower()
+        assert "@waiting.md" in result
+        assert project_file.exists()  # Project not moved
