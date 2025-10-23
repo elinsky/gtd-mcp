@@ -84,7 +84,7 @@
 
 ### Task: Implement Duplicate Detection
 
-*   [ ] **Description:** Implement `ProjectValidator.check_duplicates()` method with filesystem scanning
+*   [x] **Description:** Implement `ProjectValidator.check_duplicates()` method with filesystem scanning
     *   Add TODO comment: "Future optimization - maintain an in-memory index of existing projects"
 *   **Location:** `src/gtd_mcp/validator.py`
 *   **Expected Outcome:** All tests from Task 2.4 pass

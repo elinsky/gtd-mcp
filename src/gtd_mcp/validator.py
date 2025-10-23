@@ -1,5 +1,7 @@
 """Validation logic for GTD project creation."""
 
+from pathlib import Path
+
 from gtd_mcp.config import ConfigManager
 
 
@@ -39,3 +41,33 @@ class ProjectValidator:
         error_msg = f"Invalid area '{area}'. Valid areas: {valid_areas_str}"
 
         return (False, error_msg)
+
+    def check_duplicates(self, filename: str) -> tuple[bool, str | None]:
+        """
+        Check for duplicate project filename across all folders.
+
+        Args:
+            filename: Project filename (without .md extension)
+
+        Returns:
+            Tuple of (is_duplicate, folder_name)
+            - If duplicate found: (True, folder_name where duplicate exists)
+            - If no duplicate: (False, None)
+        """
+        # TODO: Future optimization - maintain an in-memory index of existing projects
+        # instead of scanning filesystem on each creation
+
+        repo_path = Path(self._config.get_repo_path())
+        projects_base = repo_path / "docs" / "execution_system" / "10k-projects"
+
+        # Check all four folders for duplicates
+        for folder in ["active", "incubator", "completed", "descoped"]:
+            folder_path = projects_base / folder
+            if not folder_path.exists():
+                continue
+
+            # Recursively search for the filename in this folder and its subdirectories
+            for project_file in folder_path.rglob(f"{filename}.md"):
+                return (True, folder)
+
+        return (False, None)
