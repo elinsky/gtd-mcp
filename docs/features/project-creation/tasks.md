@@ -72,7 +72,7 @@
 
 ### Task: Write Unit Tests for Duplicate Detection
 
-*   [ ] **Description:** Create unit tests for `ProjectValidator.check_duplicates()` covering:
+*   [x] **Description:** Create unit tests for `ProjectValidator.check_duplicates()` covering:
     *   Detect duplicate in `active/` folder
     *   Detect duplicate in `incubator/` folder
     *   Detect duplicate in `completed/` folder
