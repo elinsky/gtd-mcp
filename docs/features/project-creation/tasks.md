@@ -17,7 +17,7 @@
 
 ### Task: Write Unit Tests for ConfigManager
 
-*   [ ] **Description:** Create unit tests for `ConfigManager` class covering:
+*   [x] **Description:** Create unit tests for `ConfigManager` class covering:
     *   Loading valid configuration file successfully
     *   Failing gracefully on missing configuration file
     *   Failing gracefully on invalid JSON format
