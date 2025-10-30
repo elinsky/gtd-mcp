@@ -9,6 +9,7 @@ from mcp.server.stdio import stdio_server
 from mcp.types import TextContent, Tool
 
 from gtd_mcp.action_lister import ActionLister
+from gtd_mcp.auditor import Auditor
 from gtd_mcp.completer import ProjectCompleter
 from gtd_mcp.config import ConfigManager
 from gtd_mcp.creator import ProjectCreator
@@ -392,6 +393,134 @@ def update_review_dates_handler(params: dict, config_path: str | None = None) ->
         return f"Error: {str(e)}"
 
 
+def audit_projects_handler(params: dict, config_path: str | None = None) -> str:
+    """
+    Handle audit_projects tool invocation.
+
+    Args:
+        params: Tool parameters (none)
+        config_path: Optional path to config file (for testing)
+
+    Returns:
+        JSON string with validation issues
+    """
+    try:
+        config = ConfigManager(config_path)
+        auditor = Auditor(config)
+        result = auditor.audit_projects()
+        return json.dumps(result, indent=2)
+
+    except Exception as e:
+        return json.dumps({"error": str(e)}, indent=2)
+
+
+def audit_orphan_projects_handler(params: dict, config_path: str | None = None) -> str:
+    """
+    Handle audit_orphan_projects tool invocation.
+
+    Args:
+        params: Tool parameters (none)
+        config_path: Optional path to config file (for testing)
+
+    Returns:
+        JSON string with orphan projects
+    """
+    try:
+        config = ConfigManager(config_path)
+        auditor = Auditor(config)
+        result = auditor.audit_orphan_projects()
+        return json.dumps(result, indent=2)
+
+    except Exception as e:
+        return json.dumps({"error": str(e)}, indent=2)
+
+
+def audit_orphan_actions_handler(params: dict, config_path: str | None = None) -> str:
+    """
+    Handle audit_orphan_actions tool invocation.
+
+    Args:
+        params: Tool parameters (none)
+        config_path: Optional path to config file (for testing)
+
+    Returns:
+        JSON string with orphan actions
+    """
+    try:
+        config = ConfigManager(config_path)
+        auditor = Auditor(config)
+        result = auditor.audit_orphan_actions()
+        return json.dumps(result, indent=2)
+
+    except Exception as e:
+        return json.dumps({"error": str(e)}, indent=2)
+
+
+def audit_action_files_handler(params: dict, config_path: str | None = None) -> str:
+    """
+    Handle audit_action_files tool invocation.
+
+    Args:
+        params: Tool parameters (none)
+        config_path: Optional path to config file (for testing)
+
+    Returns:
+        JSON string with action file validation issues
+    """
+    try:
+        config = ConfigManager(config_path)
+        auditor = Auditor(config)
+        result = auditor.audit_action_files()
+        return json.dumps(result, indent=2)
+
+    except Exception as e:
+        return json.dumps({"error": str(e)}, indent=2)
+
+
+def list_projects_needing_review_handler(params: dict, config_path: str | None = None) -> str:
+    """
+    Handle list_projects_needing_review tool invocation.
+
+    Args:
+        params: Tool parameters (days_threshold)
+        config_path: Optional path to config file (for testing)
+
+    Returns:
+        JSON string with projects needing review
+    """
+    try:
+        config = ConfigManager(config_path)
+        auditor = Auditor(config)
+        days_threshold = params.get("days_threshold", 7)
+        result = auditor.list_projects_needing_review(days_threshold)
+        return json.dumps(result, indent=2)
+
+    except Exception as e:
+        return json.dumps({"error": str(e)}, indent=2)
+
+
+def list_actions_needing_review_handler(params: dict, config_path: str | None = None) -> str:
+    """
+    Handle list_actions_needing_review tool invocation.
+
+    Args:
+        params: Tool parameters (days_threshold)
+        config_path: Optional path to config file (for testing)
+
+    Returns:
+        JSON string with action files needing review
+    """
+    try:
+        config = ConfigManager(config_path)
+        auditor = Auditor(config)
+        days_threshold = params.get("days_threshold", 7)
+        result = auditor.list_actions_needing_review(days_threshold)
+        return json.dumps(result, indent=2)
+
+    except Exception as e:
+        return json.dumps({"error": str(e)}, indent=2)
+
+
 async def main():
     """Run the MCP server."""
     server = Server("gtd-mcp")
@@ -646,6 +775,70 @@ async def main():
                     },
                     "required": []
                 }
+            ),
+            Tool(
+                name="audit_projects",
+                description="Validate all project files for data quality issues. Checks: required fields (area, title, last_reviewed), valid areas (match configured areas), valid types (standard/habit/coordination), valid date formats (YYYY-MM-DD). Returns JSON with list of validation issues.",
+                inputSchema={
+                    "type": "object",
+                    "properties": {},
+                    "required": []
+                }
+            ),
+            Tool(
+                name="audit_orphan_projects",
+                description="Find projects without any associated next actions. Only checks standard projects (excludes habit and coordination types). Returns JSON with list of orphan projects including file path.",
+                inputSchema={
+                    "type": "object",
+                    "properties": {},
+                    "required": []
+                }
+            ),
+            Tool(
+                name="audit_orphan_actions",
+                description="Find next actions that reference non-existent projects or use invalid contexts. Validates: project tags (+project) exist as project files, context tags (@context) match existing context files. Returns JSON with list of orphan actions.",
+                inputSchema={
+                    "type": "object",
+                    "properties": {},
+                    "required": []
+                }
+            ),
+            Tool(
+                name="audit_action_files",
+                description="Validate all action list files (next.md, @waiting.md, etc.) for data quality issues. Checks: required YAML fields (title, last_reviewed). Returns JSON with list of validation issues.",
+                inputSchema={
+                    "type": "object",
+                    "properties": {},
+                    "required": []
+                }
+            ),
+            Tool(
+                name="list_projects_needing_review",
+                description="Find projects that haven't been reviewed recently. A project needs review if 'last_reviewed' is >= threshold days ago (inclusive) or missing. Default threshold: 7 days. Returns JSON with projects grouped by area.",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "days_threshold": {
+                            "type": "integer",
+                            "description": "Number of days since last review (inclusive) to flag for review (default: 7)"
+                        }
+                    },
+                    "required": []
+                }
+            ),
+            Tool(
+                name="list_actions_needing_review",
+                description="Find action list files (@macbook.md, @waiting.md, etc.) that haven't been reviewed recently. An action file needs review if 'last_reviewed' is >= threshold days ago (inclusive) or missing. Default threshold: 7 days. Returns JSON with action files needing review.",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "days_threshold": {
+                            "type": "integer",
+                            "description": "Number of days since last review (inclusive) to flag for review (default: 7)"
+                        }
+                    },
+                    "required": []
+                }
             )
         ]
 
@@ -687,6 +880,24 @@ async def main():
             return [TextContent(type="text", text=result)]
         elif name == "update_review_dates":
             result = update_review_dates_handler(arguments, config_path)
+            return [TextContent(type="text", text=result)]
+        elif name == "audit_projects":
+            result = audit_projects_handler(arguments, config_path)
+            return [TextContent(type="text", text=result)]
+        elif name == "audit_orphan_projects":
+            result = audit_orphan_projects_handler(arguments, config_path)
+            return [TextContent(type="text", text=result)]
+        elif name == "audit_orphan_actions":
+            result = audit_orphan_actions_handler(arguments, config_path)
+            return [TextContent(type="text", text=result)]
+        elif name == "audit_action_files":
+            result = audit_action_files_handler(arguments, config_path)
+            return [TextContent(type="text", text=result)]
+        elif name == "list_projects_needing_review":
+            result = list_projects_needing_review_handler(arguments, config_path)
+            return [TextContent(type="text", text=result)]
+        elif name == "list_actions_needing_review":
+            result = list_actions_needing_review_handler(arguments, config_path)
             return [TextContent(type="text", text=result)]
         else:
             raise ValueError(f"Unknown tool: {name}")
