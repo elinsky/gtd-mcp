@@ -15,6 +15,7 @@ from gtd_mcp.config import ConfigManager
 from gtd_mcp.creator import ProjectCreator
 from gtd_mcp.lister import ProjectLister
 from gtd_mcp.project_manager import ProjectManager
+from gtd_mcp.searcher import Searcher
 from gtd_mcp.validator import ProjectValidator
 
 
@@ -521,6 +522,74 @@ def list_actions_needing_review_handler(params: dict, config_path: str | None = 
         return json.dumps({"error": str(e)}, indent=2)
 
 
+def search_projects_handler(params: dict, config_path: str | None = None) -> str:
+    """
+    Handle search_projects tool invocation.
+
+    Args:
+        params: Tool parameters (query, folder, filter_area)
+        config_path: Optional path to config file (for testing)
+
+    Returns:
+        JSON string with matching projects
+    """
+    try:
+        config = ConfigManager(config_path)
+        searcher = Searcher(config)
+
+        query = params.get("query")
+        if not query:
+            return json.dumps({"error": "Missing required parameter (query)"}, indent=2)
+
+        folder = params.get("folder", "all")
+        filter_area = params.get("filter_area")
+
+        result = searcher.search_projects(
+            query=query,
+            folder=folder,
+            filter_area=filter_area
+        )
+        return json.dumps(result, indent=2)
+
+    except Exception as e:
+        return json.dumps({"error": str(e)}, indent=2)
+
+
+def search_actions_handler(params: dict, config_path: str | None = None) -> str:
+    """
+    Handle search_actions tool invocation.
+
+    Args:
+        params: Tool parameters (query, include_states, filter_project, filter_context)
+        config_path: Optional path to config file (for testing)
+
+    Returns:
+        JSON string with matching actions
+    """
+    try:
+        config = ConfigManager(config_path)
+        searcher = Searcher(config)
+
+        query = params.get("query")
+        if not query:
+            return json.dumps({"error": "Missing required parameter (query)"}, indent=2)
+
+        include_states = params.get("include_states")
+        filter_project = params.get("filter_project")
+        filter_context = params.get("filter_context")
+
+        result = searcher.search_actions(
+            query=query,
+            include_states=include_states,
+            filter_project=filter_project,
+            filter_context=filter_context
+        )
+        return json.dumps(result, indent=2)
+
+    except Exception as e:
+        return json.dumps({"error": str(e)}, indent=2)
+
+
 async def main():
     """Run the MCP server."""
     server = Server("gtd-mcp")
@@ -839,6 +908,59 @@ async def main():
                     },
                     "required": []
                 }
+            ),
+            Tool(
+                name="search_projects",
+                description="Search for projects by text in title or content. Case-insensitive search. Returns JSON with matching projects including title, area, folder, filename, match location (title/content), and snippet showing match context.",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "query": {
+                            "type": "string",
+                            "description": "Text to search for (case-insensitive)"
+                        },
+                        "folder": {
+                            "type": "string",
+                            "enum": ["active", "incubator", "completed", "all"],
+                            "description": "Which folder(s) to search (default: all)"
+                        },
+                        "filter_area": {
+                            "type": "string",
+                            "description": "Optional: filter to show only projects from a specific area (case-insensitive)"
+                        }
+                    },
+                    "required": ["query"]
+                }
+            ),
+            Tool(
+                name="search_actions",
+                description="Search for actions by text in action content. Case-insensitive search. Returns JSON with matching actions including action text, state, context, project tag, file, and full line.",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "query": {
+                            "type": "string",
+                            "description": "Text to search for (case-insensitive)"
+                        },
+                        "include_states": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "enum": ["next", "waiting", "deferred", "incubating"]
+                            },
+                            "description": "Which action states to include (default: all states)"
+                        },
+                        "filter_project": {
+                            "type": "string",
+                            "description": "Optional: filter to show only actions for a specific project (use kebab-case filename)"
+                        },
+                        "filter_context": {
+                            "type": "string",
+                            "description": "Optional: filter to show only actions for a specific context (e.g., '@macbook', '@phone')"
+                        }
+                    },
+                    "required": ["query"]
+                }
             )
         ]
 
@@ -898,6 +1020,12 @@ async def main():
             return [TextContent(type="text", text=result)]
         elif name == "list_actions_needing_review":
             result = list_actions_needing_review_handler(arguments, config_path)
+            return [TextContent(type="text", text=result)]
+        elif name == "search_projects":
+            result = search_projects_handler(arguments, config_path)
+            return [TextContent(type="text", text=result)]
+        elif name == "search_actions":
+            result = search_actions_handler(arguments, config_path)
             return [TextContent(type="text", text=result)]
         else:
             raise ValueError(f"Unknown tool: {name}")
