@@ -13,6 +13,7 @@ from gtd_mcp.completer import ProjectCompleter
 from gtd_mcp.config import ConfigManager
 from gtd_mcp.creator import ProjectCreator
 from gtd_mcp.lister import ProjectLister
+from gtd_mcp.project_manager import ProjectManager
 from gtd_mcp.validator import ProjectValidator
 
 
@@ -207,6 +208,190 @@ def list_actions_handler(params: dict, config_path: str | None = None) -> str:
         return json.dumps({"error": str(e)}, indent=2)
 
 
+def activate_project_handler(params: dict, config_path: str | None = None) -> str:
+    """
+    Handle activate_project tool invocation.
+
+    Args:
+        params: Tool parameters (title)
+        config_path: Optional path to config file (for testing)
+
+    Returns:
+        Success or error message
+    """
+    try:
+        config = ConfigManager(config_path)
+        manager = ProjectManager(config)
+        title = params.get("title")
+
+        if not title:
+            return "Error: Missing required parameter (title)"
+
+        return manager.activate_project(title)
+
+    except Exception as e:
+        return f"Error: {str(e)}"
+
+
+def move_project_to_incubator_handler(params: dict, config_path: str | None = None) -> str:
+    """
+    Handle move_project_to_incubator tool invocation.
+
+    Args:
+        params: Tool parameters (title)
+        config_path: Optional path to config file (for testing)
+
+    Returns:
+        Success or error message
+    """
+    try:
+        config = ConfigManager(config_path)
+        manager = ProjectManager(config)
+        title = params.get("title")
+
+        if not title:
+            return "Error: Missing required parameter (title)"
+
+        return manager.move_project_to_incubator(title)
+
+    except Exception as e:
+        return f"Error: {str(e)}"
+
+
+def descope_project_handler(params: dict, config_path: str | None = None) -> str:
+    """
+    Handle descope_project tool invocation.
+
+    Args:
+        params: Tool parameters (title)
+        config_path: Optional path to config file (for testing)
+
+    Returns:
+        Success or error message
+    """
+    try:
+        config = ConfigManager(config_path)
+        manager = ProjectManager(config)
+        title = params.get("title")
+
+        if not title:
+            return "Error: Missing required parameter (title)"
+
+        return manager.descope_project(title)
+
+    except Exception as e:
+        return f"Error: {str(e)}"
+
+
+def update_project_due_date_handler(params: dict, config_path: str | None = None) -> str:
+    """
+    Handle update_project_due_date tool invocation.
+
+    Args:
+        params: Tool parameters (title, due_date)
+        config_path: Optional path to config file (for testing)
+
+    Returns:
+        Success or error message
+    """
+    try:
+        config = ConfigManager(config_path)
+        manager = ProjectManager(config)
+        title = params.get("title")
+        due_date = params.get("due_date")
+
+        if not title:
+            return "Error: Missing required parameter (title)"
+
+        return manager.update_project_due_date(title, due_date)
+
+    except Exception as e:
+        return f"Error: {str(e)}"
+
+
+def update_project_area_handler(params: dict, config_path: str | None = None) -> str:
+    """
+    Handle update_project_area tool invocation.
+
+    Args:
+        params: Tool parameters (title, new_area)
+        config_path: Optional path to config file (for testing)
+
+    Returns:
+        Success or error message
+    """
+    try:
+        config = ConfigManager(config_path)
+        manager = ProjectManager(config)
+        title = params.get("title")
+        new_area = params.get("new_area")
+
+        if not title or not new_area:
+            return "Error: Missing required parameters (title, new_area)"
+
+        return manager.update_project_area(title, new_area)
+
+    except Exception as e:
+        return f"Error: {str(e)}"
+
+
+def update_project_type_handler(params: dict, config_path: str | None = None) -> str:
+    """
+    Handle update_project_type tool invocation.
+
+    Args:
+        params: Tool parameters (title, project_type)
+        config_path: Optional path to config file (for testing)
+
+    Returns:
+        Success or error message
+    """
+    try:
+        config = ConfigManager(config_path)
+        manager = ProjectManager(config)
+        title = params.get("title")
+        project_type = params.get("project_type")
+
+        if not title or not project_type:
+            return "Error: Missing required parameters (title, project_type)"
+
+        return manager.update_project_type(title, project_type)
+
+    except Exception as e:
+        return f"Error: {str(e)}"
+
+
+def update_review_dates_handler(params: dict, config_path: str | None = None) -> str:
+    """
+    Handle update_review_dates tool invocation.
+
+    Args:
+        params: Tool parameters (target_type, filter_folder, filter_area, filter_names)
+        config_path: Optional path to config file (for testing)
+
+    Returns:
+        Success message with count
+    """
+    try:
+        config = ConfigManager(config_path)
+        manager = ProjectManager(config)
+
+        target_type = params.get("target_type", "projects")
+        filter_folder = params.get("filter_folder")
+        filter_area = params.get("filter_area")
+        filter_names = params.get("filter_names")
+
+        return manager.update_review_dates(
+            target_type=target_type,
+            filter_folder=filter_folder,
+            filter_area=filter_area,
+            filter_names=filter_names
+        )
+
+    except Exception as e:
+        return f"Error: {str(e)}"
+
+
 async def main():
     """Run the MCP server."""
     server = Server("gtd-mcp")
@@ -334,6 +519,133 @@ async def main():
                     },
                     "required": []
                 }
+            ),
+            Tool(
+                name="activate_project",
+                description="Move a project from incubator to active folder. Adds 'started' date to project YAML. No validation for existing actions required - you activate first, then add actions.",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "title": {
+                            "type": "string",
+                            "description": "Project title (exact match, case-sensitive)"
+                        }
+                    },
+                    "required": ["title"]
+                }
+            ),
+            Tool(
+                name="move_project_to_incubator",
+                description="Move a project from active to incubator folder. Removes 'started' date from project YAML. Validates that project has NO incomplete 0k actions (next, waiting, deferred, or incubating) - all actions must be complete or removed first.",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "title": {
+                            "type": "string",
+                            "description": "Project title (exact match, case-sensitive)"
+                        }
+                    },
+                    "required": ["title"]
+                }
+            ),
+            Tool(
+                name="descope_project",
+                description="Move a project to descoped folder (archives project as out-of-scope). Adds 'descoped' date and removes 'started' date. Validates that project has NO incomplete 0k actions - all actions must be complete or removed first. Creates descoped/{area}/ folder if needed.",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "title": {
+                            "type": "string",
+                            "description": "Project title (exact match, case-sensitive)"
+                        }
+                    },
+                    "required": ["title"]
+                }
+            ),
+            Tool(
+                name="update_project_due_date",
+                description="Update or remove a project's due date in YAML frontmatter.",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "title": {
+                            "type": "string",
+                            "description": "Project title (exact match, case-sensitive)"
+                        },
+                        "due_date": {
+                            "type": "string",
+                            "description": "ISO date string (YYYY-MM-DD) or null to remove due date",
+                            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                        }
+                    },
+                    "required": ["title"]
+                }
+            ),
+            Tool(
+                name="update_project_area",
+                description="Update a project's area of focus. Moves the project file to the new area's folder and updates YAML frontmatter. Area must match configured areas (case-insensitive).",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "title": {
+                            "type": "string",
+                            "description": "Project title (exact match, case-sensitive)"
+                        },
+                        "new_area": {
+                            "type": "string",
+                            "description": "New area name (must match configured areas, case-insensitive)"
+                        }
+                    },
+                    "required": ["title", "new_area"]
+                }
+            ),
+            Tool(
+                name="update_project_type",
+                description="Update a project's type in YAML frontmatter. Types: standard (regular project), habit (recurring practice), coordination (multi-stakeholder coordination).",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "title": {
+                            "type": "string",
+                            "description": "Project title (exact match, case-sensitive)"
+                        },
+                        "project_type": {
+                            "type": "string",
+                            "enum": ["standard", "habit", "coordination"],
+                            "description": "New project type"
+                        }
+                    },
+                    "required": ["title", "project_type"]
+                }
+            ),
+            Tool(
+                name="update_review_dates",
+                description="Bulk update 'last_reviewed' dates for projects and/or action lists. Useful during weekly review to mark items as reviewed. Supports flexible filtering by folder, area, or specific names.",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "target_type": {
+                            "type": "string",
+                            "enum": ["projects", "actions", "all"],
+                            "description": "What to update: 'projects' (project files), 'actions' (action list files), or 'all' (both) (default: projects)"
+                        },
+                        "filter_folder": {
+                            "type": "string",
+                            "enum": ["active", "incubator", "all"],
+                            "description": "For projects: which folder(s) to update (default: all folders)"
+                        },
+                        "filter_area": {
+                            "type": "string",
+                            "description": "For projects: update only projects in specific area (case-insensitive)"
+                        },
+                        "filter_names": {
+                            "type": "array",
+                            "items": {"type": "string"},
+                            "description": "Specific project titles or action list names to update (e.g., ['Project Name'] or ['@macbook', '@waiting'])"
+                        }
+                    },
+                    "required": []
+                }
             )
         ]
 
@@ -354,6 +666,27 @@ async def main():
             return [TextContent(type="text", text=result)]
         elif name == "complete_project":
             result = complete_project_handler(arguments, config_path)
+            return [TextContent(type="text", text=result)]
+        elif name == "activate_project":
+            result = activate_project_handler(arguments, config_path)
+            return [TextContent(type="text", text=result)]
+        elif name == "move_project_to_incubator":
+            result = move_project_to_incubator_handler(arguments, config_path)
+            return [TextContent(type="text", text=result)]
+        elif name == "descope_project":
+            result = descope_project_handler(arguments, config_path)
+            return [TextContent(type="text", text=result)]
+        elif name == "update_project_due_date":
+            result = update_project_due_date_handler(arguments, config_path)
+            return [TextContent(type="text", text=result)]
+        elif name == "update_project_area":
+            result = update_project_area_handler(arguments, config_path)
+            return [TextContent(type="text", text=result)]
+        elif name == "update_project_type":
+            result = update_project_type_handler(arguments, config_path)
+            return [TextContent(type="text", text=result)]
+        elif name == "update_review_dates":
+            result = update_review_dates_handler(arguments, config_path)
             return [TextContent(type="text", text=result)]
         else:
             raise ValueError(f"Unknown tool: {name}")
