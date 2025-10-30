@@ -309,3 +309,379 @@ type: standard
         assert "Test Project" in result
         # Career should not appear since it's empty
         assert "Career:" not in result
+
+
+class TestProjectListerListProjects:
+    """Test ProjectLister.list_projects() with JSON output and flexible filtering."""
+
+    def test_list_all_active_projects_grouped_by_area(self, tmp_path):
+        """
+        Test listing active projects grouped by area (default behavior).
+
+        Given: Active projects in multiple areas
+        When: Calling list_projects()
+        Then: Returns JSON with projects grouped by area
+        """
+        # Given
+        repo_path = tmp_path / "repo"
+        active_path = repo_path / "docs" / "execution_system" / "10k-projects" / "active"
+
+        health_dir = active_path / "health"
+        health_dir.mkdir(parents=True)
+        (health_dir / "morning-routine.md").write_text("""---
+area: Health
+title: Morning Routine
+type: habit
+---
+""")
+
+        career_dir = active_path / "career"
+        career_dir.mkdir(parents=True)
+        (career_dir / "job-search.md").write_text("""---
+area: Career
+title: Job Search
+type: standard
+---
+""")
+
+        config_file = tmp_path / "config.json"
+        config_data = {
+            "gtd_repo_path": str(repo_path),
+            "areas": [
+                {"name": "Health", "kebab": "health"},
+                {"name": "Career", "kebab": "career"},
+            ],
+        }
+        config_file.write_text(json.dumps(config_data))
+        config = ConfigManager(str(config_file))
+        lister = ProjectLister(config)
+
+        # When
+        result = lister.list_projects()
+
+        # Then
+        assert "groups" in result
+        assert len(result["groups"]) == 2
+
+        # Find Career group
+        career_group = next(g for g in result["groups"] if g["group_name"] == "Career")
+        assert len(career_group["projects"]) == 1
+        assert career_group["projects"][0]["title"] == "Job Search"
+        assert career_group["projects"][0]["type"] == "standard"
+        assert career_group["projects"][0]["folder"] == "active"
+
+        # Find Health group
+        health_group = next(g for g in result["groups"] if g["group_name"] == "Health")
+        assert len(health_group["projects"]) == 1
+        assert health_group["projects"][0]["title"] == "Morning Routine"
+        assert health_group["projects"][0]["type"] == "habit"
+
+    def test_list_incubator_projects(self, tmp_path):
+        """
+        Test listing incubator projects only.
+
+        Given: Projects in active and incubator folders
+        When: Calling list_projects(folder="incubator")
+        Then: Returns only incubator projects
+        """
+        # Given
+        repo_path = tmp_path / "repo"
+        projects_base = repo_path / "docs" / "execution_system" / "10k-projects"
+
+        # Create active project
+        active_dir = projects_base / "active" / "health"
+        active_dir.mkdir(parents=True)
+        (active_dir / "active-project.md").write_text("""---
+area: Health
+title: Active Project
+type: standard
+---
+""")
+
+        # Create incubator project
+        incubator_dir = projects_base / "incubator" / "health"
+        incubator_dir.mkdir(parents=True)
+        (incubator_dir / "incubator-project.md").write_text("""---
+area: Health
+title: Incubator Project
+type: standard
+---
+""")
+
+        config_file = tmp_path / "config.json"
+        config_data = {
+            "gtd_repo_path": str(repo_path),
+            "areas": [{"name": "Health", "kebab": "health"}],
+        }
+        config_file.write_text(json.dumps(config_data))
+        config = ConfigManager(str(config_file))
+        lister = ProjectLister(config)
+
+        # When
+        result = lister.list_projects(folder="incubator")
+
+        # Then
+        assert len(result["groups"]) == 1
+        assert result["groups"][0]["projects"][0]["title"] == "Incubator Project"
+        assert result["groups"][0]["projects"][0]["folder"] == "incubator"
+
+    def test_list_all_folders(self, tmp_path):
+        """
+        Test listing projects from all folders.
+
+        Given: Projects in active, incubator, and completed
+        When: Calling list_projects(folder="all")
+        Then: Returns projects from all folders
+        """
+        # Given
+        repo_path = tmp_path / "repo"
+        projects_base = repo_path / "docs" / "execution_system" / "10k-projects"
+
+        for folder in ["active", "incubator", "completed"]:
+            folder_dir = projects_base / folder / "health"
+            folder_dir.mkdir(parents=True)
+            (folder_dir / f"{folder}-project.md").write_text(f"""---
+area: Health
+title: {folder.capitalize()} Project
+type: standard
+---
+""")
+
+        config_file = tmp_path / "config.json"
+        config_data = {
+            "gtd_repo_path": str(repo_path),
+            "areas": [{"name": "Health", "kebab": "health"}],
+        }
+        config_file.write_text(json.dumps(config_data))
+        config = ConfigManager(str(config_file))
+        lister = ProjectLister(config)
+
+        # When
+        result = lister.list_projects(folder="all")
+
+        # Then
+        all_projects = result["groups"][0]["projects"]
+        assert len(all_projects) == 3
+        folders = {p["folder"] for p in all_projects}
+        assert folders == {"active", "incubator", "completed"}
+
+    def test_filter_by_area(self, tmp_path):
+        """
+        Test filtering projects by specific area.
+
+        Given: Projects in multiple areas
+        When: Calling list_projects(filter_area="Health")
+        Then: Returns only Health area projects
+        """
+        # Given
+        repo_path = tmp_path / "repo"
+        active_path = repo_path / "docs" / "execution_system" / "10k-projects" / "active"
+
+        health_dir = active_path / "health"
+        health_dir.mkdir(parents=True)
+        (health_dir / "health-project.md").write_text("""---
+area: Health
+title: Health Project
+type: standard
+---
+""")
+
+        career_dir = active_path / "career"
+        career_dir.mkdir(parents=True)
+        (career_dir / "career-project.md").write_text("""---
+area: Career
+title: Career Project
+type: standard
+---
+""")
+
+        config_file = tmp_path / "config.json"
+        config_data = {
+            "gtd_repo_path": str(repo_path),
+            "areas": [
+                {"name": "Health", "kebab": "health"},
+                {"name": "Career", "kebab": "career"},
+            ],
+        }
+        config_file.write_text(json.dumps(config_data))
+        config = ConfigManager(str(config_file))
+        lister = ProjectLister(config)
+
+        # When
+        result = lister.list_projects(filter_area="Health")
+
+        # Then
+        assert len(result["groups"]) == 1
+        assert result["groups"][0]["group_name"] == "Health"
+        assert result["groups"][0]["projects"][0]["title"] == "Health Project"
+
+    def test_filter_by_has_due(self, tmp_path):
+        """
+        Test filtering projects that have due dates.
+
+        Given: Mix of projects with and without due dates
+        When: Calling list_projects(filter_has_due=True)
+        Then: Returns only projects with due dates
+        """
+        # Given
+        repo_path = tmp_path / "repo"
+        active_path = repo_path / "docs" / "execution_system" / "10k-projects" / "active"
+
+        health_dir = active_path / "health"
+        health_dir.mkdir(parents=True)
+        (health_dir / "with-due.md").write_text("""---
+area: Health
+title: With Due Date
+type: standard
+due: 2025-12-31
+---
+""")
+        (health_dir / "without-due.md").write_text("""---
+area: Health
+title: Without Due Date
+type: standard
+---
+""")
+
+        config_file = tmp_path / "config.json"
+        config_data = {
+            "gtd_repo_path": str(repo_path),
+            "areas": [{"name": "Health", "kebab": "health"}],
+        }
+        config_file.write_text(json.dumps(config_data))
+        config = ConfigManager(str(config_file))
+        lister = ProjectLister(config)
+
+        # When
+        result = lister.list_projects(filter_has_due=True)
+
+        # Then
+        all_projects = result["groups"][0]["projects"]
+        assert len(all_projects) == 1
+        assert all_projects[0]["title"] == "With Due Date"
+        assert all_projects[0]["due"] == "2025-12-31"
+
+    def test_group_by_due_date(self, tmp_path):
+        """
+        Test grouping projects by due date.
+
+        Given: Projects with various due dates
+        When: Calling list_projects(group_by="due_date")
+        Then: Returns projects sorted by due date
+        """
+        # Given
+        repo_path = tmp_path / "repo"
+        active_path = repo_path / "docs" / "execution_system" / "10k-projects" / "active"
+
+        health_dir = active_path / "health"
+        health_dir.mkdir(parents=True)
+
+        overdue_date = (date.today() - timedelta(days=5)).isoformat()
+        soon_date = (date.today() + timedelta(days=3)).isoformat()
+        later_date = (date.today() + timedelta(days=30)).isoformat()
+
+        (health_dir / "overdue.md").write_text(f"""---
+area: Health
+title: Overdue Project
+type: standard
+due: {overdue_date}
+---
+""")
+        (health_dir / "soon.md").write_text(f"""---
+area: Health
+title: Soon Project
+type: standard
+due: {soon_date}
+---
+""")
+        (health_dir / "later.md").write_text(f"""---
+area: Health
+title: Later Project
+type: standard
+due: {later_date}
+---
+""")
+        (health_dir / "no-due.md").write_text("""---
+area: Health
+title: No Due Project
+type: standard
+---
+""")
+
+        config_file = tmp_path / "config.json"
+        config_data = {
+            "gtd_repo_path": str(repo_path),
+            "areas": [{"name": "Health", "kebab": "health"}],
+        }
+        config_file.write_text(json.dumps(config_data))
+        config = ConfigManager(str(config_file))
+        lister = ProjectLister(config)
+
+        # When
+        result = lister.list_projects(group_by="due_date")
+
+        # Then
+        # Should have groups for: Overdue, This Week, Later, No Due Date
+        assert len(result["groups"]) == 4
+
+        overdue_group = next(g for g in result["groups"] if g["group_name"] == "Overdue")
+        assert len(overdue_group["projects"]) == 1
+        assert overdue_group["projects"][0]["title"] == "Overdue Project"
+
+        this_week_group = next(g for g in result["groups"] if g["group_name"] == "This Week")
+        assert len(this_week_group["projects"]) == 1
+        assert this_week_group["projects"][0]["title"] == "Soon Project"
+
+    def test_flat_grouping(self, tmp_path):
+        """
+        Test flat grouping (no grouping).
+
+        Given: Projects in multiple areas
+        When: Calling list_projects(group_by="flat")
+        Then: Returns all projects in single group sorted by title
+        """
+        # Given
+        repo_path = tmp_path / "repo"
+        active_path = repo_path / "docs" / "execution_system" / "10k-projects" / "active"
+
+        health_dir = active_path / "health"
+        health_dir.mkdir(parents=True)
+        (health_dir / "zebra.md").write_text("""---
+area: Health
+title: Zebra Project
+type: standard
+---
+""")
+
+        career_dir = active_path / "career"
+        career_dir.mkdir(parents=True)
+        (career_dir / "alpha.md").write_text("""---
+area: Career
+title: Alpha Project
+type: standard
+---
+""")
+
+        config_file = tmp_path / "config.json"
+        config_data = {
+            "gtd_repo_path": str(repo_path),
+            "areas": [
+                {"name": "Health", "kebab": "health"},
+                {"name": "Career", "kebab": "career"},
+            ],
+        }
+        config_file.write_text(json.dumps(config_data))
+        config = ConfigManager(str(config_file))
+        lister = ProjectLister(config)
+
+        # When
+        result = lister.list_projects(group_by="flat")
+
+        # Then
+        assert len(result["groups"]) == 1
+        assert result["groups"][0]["group_name"] == "All Projects"
+        projects = result["groups"][0]["projects"]
+        assert len(projects) == 2
+        # Should be sorted by title
+        assert projects[0]["title"] == "Alpha Project"
+        assert projects[1]["title"] == "Zebra Project"

@@ -1,5 +1,6 @@
 """MCP server for GTD project creation."""
 
+import json
 import os
 from pathlib import Path
 
@@ -93,6 +94,45 @@ def list_active_projects_handler(params: dict, config_path: str | None = None) -
 
     except Exception as e:
         return f"Error: {str(e)}"
+
+
+def list_projects_handler(params: dict, config_path: str | None = None) -> str:
+    """
+    Handle list_projects tool invocation.
+
+    Args:
+        params: Tool parameters (folder, group_by, filter_area, filter_has_due)
+        config_path: Optional path to config file (for testing)
+
+    Returns:
+        JSON string with projects grouped according to parameters
+    """
+    try:
+        # Load configuration
+        config = ConfigManager(config_path)
+
+        # Initialize lister
+        lister = ProjectLister(config)
+
+        # Extract parameters with defaults
+        folder = params.get("folder", "active")
+        group_by = params.get("group_by", "area")
+        filter_area = params.get("filter_area")
+        filter_has_due = params.get("filter_has_due")
+
+        # List projects
+        result = lister.list_projects(
+            folder=folder,
+            group_by=group_by,
+            filter_area=filter_area,
+            filter_has_due=filter_has_due
+        )
+
+        # Return as JSON string
+        return json.dumps(result, indent=2)
+
+    except Exception as e:
+        return json.dumps({"error": str(e)}, indent=2)
 
 
 def complete_project_handler(params: dict, config_path: str | None = None) -> str:
@@ -195,6 +235,34 @@ async def main():
                     },
                     "required": ["title"]
                 }
+            ),
+            Tool(
+                name="list_projects",
+                description="List GTD projects with flexible filtering and grouping options. Returns JSON with project metadata including title, area, type, folder, due date, and filename.",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "folder": {
+                            "type": "string",
+                            "enum": ["active", "incubator", "completed", "all"],
+                            "description": "Which folder(s) to list projects from (default: active)"
+                        },
+                        "group_by": {
+                            "type": "string",
+                            "enum": ["area", "due_date", "flat"],
+                            "description": "How to group projects: 'area' groups by area of focus, 'due_date' groups by urgency (Overdue/This Week/Later/No Due Date), 'flat' returns all projects in one group sorted by title (default: area)"
+                        },
+                        "filter_area": {
+                            "type": "string",
+                            "description": "Optional: filter to show only projects from a specific area (case-insensitive)"
+                        },
+                        "filter_has_due": {
+                            "type": "boolean",
+                            "description": "Optional: filter to show only projects with due dates (true) or without due dates (false)"
+                        }
+                    },
+                    "required": []
+                }
             )
         ]
 
@@ -206,6 +274,9 @@ async def main():
             return [TextContent(type="text", text=result)]
         elif name == "list_active_projects":
             result = list_active_projects_handler(arguments, config_path)
+            return [TextContent(type="text", text=result)]
+        elif name == "list_projects":
+            result = list_projects_handler(arguments, config_path)
             return [TextContent(type="text", text=result)]
         elif name == "complete_project":
             result = complete_project_handler(arguments, config_path)
