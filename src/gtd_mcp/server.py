@@ -8,6 +8,7 @@ from mcp.server import Server
 from mcp.server.stdio import stdio_server
 from mcp.types import TextContent, Tool
 
+from gtd_mcp.action_lister import ActionLister
 from gtd_mcp.completer import ProjectCompleter
 from gtd_mcp.config import ConfigManager
 from gtd_mcp.creator import ProjectCreator
@@ -167,6 +168,45 @@ def complete_project_handler(params: dict, config_path: str | None = None) -> st
         return f"Error: {str(e)}"
 
 
+def list_actions_handler(params: dict, config_path: str | None = None) -> str:
+    """
+    Handle list_actions tool invocation.
+
+    Args:
+        params: Tool parameters (group_by, include_states, filter_project, filter_context)
+        config_path: Optional path to config file (for testing)
+
+    Returns:
+        JSON string with actions grouped according to parameters
+    """
+    try:
+        # Load configuration
+        config = ConfigManager(config_path)
+
+        # Initialize lister
+        lister = ActionLister(config)
+
+        # Extract parameters with defaults
+        group_by = params.get("group_by", "project")
+        include_states = params.get("include_states")
+        filter_project = params.get("filter_project")
+        filter_context = params.get("filter_context")
+
+        # List actions
+        result = lister.list_actions(
+            group_by=group_by,
+            include_states=include_states,
+            filter_project=filter_project,
+            filter_context=filter_context
+        )
+
+        # Return as JSON string
+        return json.dumps(result, indent=2)
+
+    except Exception as e:
+        return json.dumps({"error": str(e)}, indent=2)
+
+
 async def main():
     """Run the MCP server."""
     server = Server("gtd-mcp")
@@ -263,6 +303,37 @@ async def main():
                     },
                     "required": []
                 }
+            ),
+            Tool(
+                name="list_actions",
+                description="List GTD next actions with flexible filtering and grouping options. Returns JSON with action metadata including text, date, context, project, due date, defer date, and state.",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "group_by": {
+                            "type": "string",
+                            "enum": ["project", "context", "flat"],
+                            "description": "How to group actions: 'project' groups by project folder (active/incubator), then project, then state (next/waiting/deferred/incubating); 'context' groups by context (@macbook, @phone, @waiting, etc.); 'flat' returns ungrouped list (default: project)"
+                        },
+                        "include_states": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "enum": ["next", "waiting", "deferred", "incubating"]
+                            },
+                            "description": "Which action states to include (default: all states)"
+                        },
+                        "filter_project": {
+                            "type": "string",
+                            "description": "Optional: filter to show only actions for a specific project (use kebab-case filename)"
+                        },
+                        "filter_context": {
+                            "type": "string",
+                            "description": "Optional: filter to show only actions for a specific context (e.g., '@macbook', '@phone')"
+                        }
+                    },
+                    "required": []
+                }
             )
         ]
 
@@ -277,6 +348,9 @@ async def main():
             return [TextContent(type="text", text=result)]
         elif name == "list_projects":
             result = list_projects_handler(arguments, config_path)
+            return [TextContent(type="text", text=result)]
+        elif name == "list_actions":
+            result = list_actions_handler(arguments, config_path)
             return [TextContent(type="text", text=result)]
         elif name == "complete_project":
             result = complete_project_handler(arguments, config_path)
