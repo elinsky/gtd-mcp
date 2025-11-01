@@ -9,6 +9,7 @@ from mcp.server.stdio import stdio_server
 from mcp.types import TextContent, Tool
 
 from gtd_mcp.action_lister import ActionLister
+from gtd_mcp.action_manager import ActionManager
 from gtd_mcp.area_lister import AreaLister
 from gtd_mcp.auditor import Auditor
 from gtd_mcp.completer import ProjectCompleter
@@ -611,6 +612,40 @@ def list_areas_handler(params: dict, config_path: str | None = None) -> str:
         return json.dumps({"error": str(e)}, indent=2)
 
 
+def add_action_handler(params: dict, config_path: str | None = None) -> str:
+    """
+    Handle add_action tool invocation.
+
+    Args:
+        params: Tool parameters (text, context, project?, due?, defer?, action_date?)
+        config_path: Optional path to config file (for testing)
+
+    Returns:
+        Success or error message
+    """
+    try:
+        config = ConfigManager(config_path)
+        manager = ActionManager(config)
+
+        text = params.get("text")
+        context = params.get("context")
+
+        if not text or not context:
+            return "Error: Missing required parameters (text, context)"
+
+        return manager.add_action(
+            text=text,
+            context=context,
+            project=params.get("project"),
+            due=params.get("due"),
+            defer=params.get("defer"),
+            action_date=params.get("action_date")
+        )
+
+    except Exception as e:
+        return f"Error: {str(e)}"
+
+
 async def main():
     """Run the MCP server."""
     server = Server("gtd-mcp")
@@ -991,6 +1026,43 @@ async def main():
                     "properties": {},
                     "required": []
                 }
+            ),
+            Tool(
+                name="add_action",
+                description="Add a next action to a context list file. Validates that project exists if +project tag is provided. Action is added to top of context file with creation date.",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "text": {
+                            "type": "string",
+                            "description": "Action text (without @context or +project tags)"
+                        },
+                        "context": {
+                            "type": "string",
+                            "description": "Context tag (e.g., '@macbook', '@phone', '@home')"
+                        },
+                        "project": {
+                            "type": "string",
+                            "description": "Optional project filename in kebab-case (e.g., 'ml-refresh'). Will be validated against existing projects."
+                        },
+                        "due": {
+                            "type": "string",
+                            "description": "Optional due date in ISO format YYYY-MM-DD",
+                            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                        },
+                        "defer": {
+                            "type": "string",
+                            "description": "Optional defer date in ISO format YYYY-MM-DD",
+                            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                        },
+                        "action_date": {
+                            "type": "string",
+                            "description": "Optional creation date in ISO format YYYY-MM-DD (defaults to today)",
+                            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                        }
+                    },
+                    "required": ["text", "context"]
+                }
             )
         ]
 
@@ -1059,6 +1131,9 @@ async def main():
             return [TextContent(type="text", text=result)]
         elif name == "list_areas":
             result = list_areas_handler(arguments, config_path)
+            return [TextContent(type="text", text=result)]
+        elif name == "add_action":
+            result = add_action_handler(arguments, config_path)
             return [TextContent(type="text", text=result)]
         else:
             raise ValueError(f"Unknown tool: {name}")
