@@ -15,6 +15,7 @@ from gtd_mcp.auditor import Auditor
 from gtd_mcp.completer import ProjectCompleter
 from gtd_mcp.config import ConfigManager
 from gtd_mcp.creator import ProjectCreator
+from gtd_mcp.goal_lister import GoalLister
 from gtd_mcp.lister import ProjectLister
 from gtd_mcp.project_manager import ProjectManager
 from gtd_mcp.searcher import Searcher
@@ -767,6 +768,26 @@ def complete_action_handler(params: dict, config_path: str | None = None) -> str
         return f"Error: {str(e)}"
 
 
+def list_goals_handler(params: dict, config_path: str | None = None) -> str:
+    """
+    Handle list_goals tool invocation.
+
+    Args:
+        params: Tool parameters (none)
+        config_path: Optional path to config file (for testing)
+
+    Returns:
+        JSON string with goals grouped by folder
+    """
+    try:
+        config = ConfigManager(config_path)
+        lister = GoalLister(config)
+        return lister.list_goals()
+
+    except Exception as e:
+        return json.dumps({"error": str(e)}, indent=2)
+
+
 async def main():
     """Run the MCP server."""
     server = Server("gtd-mcp")
@@ -1291,6 +1312,15 @@ async def main():
                     },
                     "required": ["file_path", "line_number"]
                 }
+            ),
+            Tool(
+                name="list_goals",
+                description="List all goals (30k level) grouped by folder. Only returns files with type: goal in YAML frontmatter. Returns JSON with active and incubator goals.",
+                inputSchema={
+                    "type": "object",
+                    "properties": {},
+                    "required": []
+                }
             )
         ]
 
@@ -1374,6 +1404,9 @@ async def main():
             return [TextContent(type="text", text=result)]
         elif name == "complete_action":
             result = complete_action_handler(arguments, config_path)
+            return [TextContent(type="text", text=result)]
+        elif name == "list_goals":
+            result = list_goals_handler(arguments, config_path)
             return [TextContent(type="text", text=result)]
         else:
             raise ValueError(f"Unknown tool: {name}")
