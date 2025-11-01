@@ -468,3 +468,263 @@ last_reviewed: 2025-10-20
         content = incubating_file.read_text()
         today = date.today().strftime("%Y-%m-%d")
         assert f"- [ ] {today} Maybe someday explore this @incubating +experimental-idea" in content
+
+
+class TestActionManagerCompleteAction:
+    """Test ActionManager complete_action functionality."""
+
+    def test_completes_action_by_line_number(self, tmp_path):
+        """
+        Test completing action using line number.
+
+        Given: Context file with multiple actions
+        When: Completing action at specific line
+        Then: Action marked complete, moved to completed.md, removed from source
+        """
+        # Given
+        repo_path = tmp_path / "repo"
+        contexts_dir = repo_path / "docs" / "execution_system" / "00k-next-actions" / "contexts"
+        contexts_dir.mkdir(parents=True)
+
+        macbook_file = contexts_dir / "@macbook.md"
+        macbook_file.write_text("""---
+title: Macbook
+last_reviewed: 2025-10-20
+---
+
+- [ ] 2025-10-20 First action @macbook +project-one
+- [ ] 2025-10-21 Second action @macbook +project-two
+- [ ] 2025-10-22 Third action @macbook +project-three
+""")
+
+        actions_dir = repo_path / "docs" / "execution_system" / "00k-next-actions"
+        completed_file = actions_dir / "completed.md"
+        completed_file.write_text("""---
+title: Completed Actions
+last_reviewed: 2025-10-20
+---
+
+""")
+
+        config_file = tmp_path / "config.json"
+        config_file.write_text(json.dumps({
+            "gtd_repo_path": str(repo_path),
+            "areas": [{"name": "Health", "kebab": "health"}]
+        }))
+
+        config = ConfigManager(str(config_file))
+        manager = ActionManager(config)
+
+        # When - complete line 6 (second action)
+        result = manager.complete_action(
+            file_path="contexts/@macbook.md",
+            line_number=7
+        )
+
+        # Then
+        assert "✓ Successfully completed action" in result
+
+        # Source file should have action removed
+        source_content = macbook_file.read_text()
+        assert "Second action" not in source_content
+        assert "First action" in source_content
+        assert "Third action" in source_content
+
+        # Completed file should have action with completion date
+        completed_content = completed_file.read_text()
+        today = date.today().strftime("%Y-%m-%d")
+        assert f"- [x] {today} 2025-10-21 Second action @macbook +project-two" in completed_content
+
+    def test_complete_preserves_due_and_defer_dates(self, tmp_path):
+        """
+        Test that completing action preserves due: and defer: tags.
+
+        Given: Action with due and defer dates
+        When: Completing action
+        Then: Tags are preserved in completed.md
+        """
+        # Given
+        repo_path = tmp_path / "repo"
+        contexts_dir = repo_path / "docs" / "execution_system" / "00k-next-actions" / "contexts"
+        contexts_dir.mkdir(parents=True)
+
+        macbook_file = contexts_dir / "@macbook.md"
+        macbook_file.write_text("""---
+title: Macbook
+last_reviewed: 2025-10-20
+---
+
+- [ ] 2025-10-15 Action with dates @macbook +project due:2025-11-01 defer:2025-10-20
+""")
+
+        actions_dir = repo_path / "docs" / "execution_system" / "00k-next-actions"
+        completed_file = actions_dir / "completed.md"
+        completed_file.write_text("""---
+title: Completed Actions
+last_reviewed: 2025-10-20
+---
+
+""")
+
+        config_file = tmp_path / "config.json"
+        config_file.write_text(json.dumps({
+            "gtd_repo_path": str(repo_path),
+            "areas": [{"name": "Health", "kebab": "health"}]
+        }))
+
+        config = ConfigManager(str(config_file))
+        manager = ActionManager(config)
+
+        # When
+        result = manager.complete_action(
+            file_path="contexts/@macbook.md",
+            line_number=6
+        )
+
+        # Then
+        completed_content = completed_file.read_text()
+        today = date.today().strftime("%Y-%m-%d")
+        assert f"- [x] {today} 2025-10-15 Action with dates @macbook +project due:2025-11-01 defer:2025-10-20" in completed_content
+
+    def test_complete_with_custom_completion_date(self, tmp_path):
+        """
+        Test completing action with custom completion date.
+
+        Given: Context file with action
+        When: Completing with specific completion date
+        Then: Action uses provided completion date
+        """
+        # Given
+        repo_path = tmp_path / "repo"
+        contexts_dir = repo_path / "docs" / "execution_system" / "00k-next-actions" / "contexts"
+        contexts_dir.mkdir(parents=True)
+
+        macbook_file = contexts_dir / "@macbook.md"
+        macbook_file.write_text("""---
+title: Macbook
+last_reviewed: 2025-10-20
+---
+
+- [ ] 2025-10-15 Action to complete @macbook
+""")
+
+        actions_dir = repo_path / "docs" / "execution_system" / "00k-next-actions"
+        completed_file = actions_dir / "completed.md"
+        completed_file.write_text("""---
+title: Completed Actions
+last_reviewed: 2025-10-20
+---
+
+""")
+
+        config_file = tmp_path / "config.json"
+        config_file.write_text(json.dumps({
+            "gtd_repo_path": str(repo_path),
+            "areas": [{"name": "Health", "kebab": "health"}]
+        }))
+
+        config = ConfigManager(str(config_file))
+        manager = ActionManager(config)
+
+        # When
+        result = manager.complete_action(
+            file_path="contexts/@macbook.md",
+            line_number=6,
+            completion_date="2025-10-25"
+        )
+
+        # Then
+        completed_content = completed_file.read_text()
+        assert "- [x] 2025-10-25 2025-10-15 Action to complete @macbook" in completed_content
+
+    def test_complete_action_from_waiting_list(self, tmp_path):
+        """
+        Test completing action from @waiting list.
+
+        Given: @waiting.md with action
+        When: Completing action
+        Then: Works correctly for special state files
+        """
+        # Given
+        repo_path = tmp_path / "repo"
+        actions_dir = repo_path / "docs" / "execution_system" / "00k-next-actions"
+        actions_dir.mkdir(parents=True)
+
+        waiting_file = actions_dir / "@waiting.md"
+        waiting_file.write_text("""---
+title: Waiting For
+last_reviewed: 2025-10-20
+---
+
+- [ ] 2025-10-18 Waiting for response @waiting +project-x
+""")
+
+        completed_file = actions_dir / "completed.md"
+        completed_file.write_text("""---
+title: Completed Actions
+last_reviewed: 2025-10-20
+---
+
+""")
+
+        config_file = tmp_path / "config.json"
+        config_file.write_text(json.dumps({
+            "gtd_repo_path": str(repo_path),
+            "areas": [{"name": "Health", "kebab": "health"}]
+        }))
+
+        config = ConfigManager(str(config_file))
+        manager = ActionManager(config)
+
+        # When
+        result = manager.complete_action(
+            file_path="@waiting.md",
+            line_number=6
+        )
+
+        # Then
+        assert "✓ Successfully completed action" in result
+        completed_content = completed_file.read_text()
+        today = date.today().strftime("%Y-%m-%d")
+        assert f"- [x] {today} 2025-10-18 Waiting for response @waiting +project-x" in completed_content
+
+    def test_error_on_invalid_line_number(self, tmp_path):
+        """
+        Test error when line number doesn't contain an action.
+
+        Given: Context file
+        When: Completing invalid line number
+        Then: Returns error
+        """
+        # Given
+        repo_path = tmp_path / "repo"
+        contexts_dir = repo_path / "docs" / "execution_system" / "00k-next-actions" / "contexts"
+        contexts_dir.mkdir(parents=True)
+
+        macbook_file = contexts_dir / "@macbook.md"
+        macbook_file.write_text("""---
+title: Macbook
+last_reviewed: 2025-10-20
+---
+
+- [ ] 2025-10-20 Action @macbook
+""")
+
+        config_file = tmp_path / "config.json"
+        config_file.write_text(json.dumps({
+            "gtd_repo_path": str(repo_path),
+            "areas": [{"name": "Health", "kebab": "health"}]
+        }))
+
+        config = ConfigManager(str(config_file))
+        manager = ActionManager(config)
+
+        # When - try to complete line 1 (YAML header)
+        result = manager.complete_action(
+            file_path="contexts/@macbook.md",
+            line_number=1
+        )
+
+        # Then
+        assert "Error" in result
+        assert "incomplete" in result.lower()

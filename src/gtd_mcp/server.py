@@ -736,6 +736,37 @@ def add_to_incubating_handler(params: dict, config_path: str | None = None) -> s
         return f"Error: {str(e)}"
 
 
+def complete_action_handler(params: dict, config_path: str | None = None) -> str:
+    """
+    Handle complete_action tool invocation.
+
+    Args:
+        params: Tool parameters (file_path, line_number, completion_date?)
+        config_path: Optional path to config file (for testing)
+
+    Returns:
+        Success or error message
+    """
+    try:
+        config = ConfigManager(config_path)
+        manager = ActionManager(config)
+
+        file_path = params.get("file_path")
+        line_number = params.get("line_number")
+
+        if not file_path or line_number is None:
+            return "Error: Missing required parameters (file_path, line_number)"
+
+        return manager.complete_action(
+            file_path=file_path,
+            line_number=line_number,
+            completion_date=params.get("completion_date")
+        )
+
+    except Exception as e:
+        return f"Error: {str(e)}"
+
+
 async def main():
     """Run the MCP server."""
     server = Server("gtd-mcp")
@@ -1237,6 +1268,29 @@ async def main():
                     },
                     "required": ["text"]
                 }
+            ),
+            Tool(
+                name="complete_action",
+                description="Complete an action by line number. Marks action as complete, moves to completed.md, removes from source file.",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "file_path": {
+                            "type": "string",
+                            "description": "Relative path to action file (e.g., 'contexts/@macbook.md' or '@waiting.md')"
+                        },
+                        "line_number": {
+                            "type": "integer",
+                            "description": "Line number of action to complete (1-indexed as shown in editors)"
+                        },
+                        "completion_date": {
+                            "type": "string",
+                            "description": "Optional completion date in ISO format YYYY-MM-DD (defaults to today)",
+                            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                        }
+                    },
+                    "required": ["file_path", "line_number"]
+                }
             )
         ]
 
@@ -1317,6 +1371,9 @@ async def main():
             return [TextContent(type="text", text=result)]
         elif name == "add_to_incubating":
             result = add_to_incubating_handler(arguments, config_path)
+            return [TextContent(type="text", text=result)]
+        elif name == "complete_action":
+            result = complete_action_handler(arguments, config_path)
             return [TextContent(type="text", text=result)]
         else:
             raise ValueError(f"Unknown tool: {name}")

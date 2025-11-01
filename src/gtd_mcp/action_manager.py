@@ -232,3 +232,97 @@ class ActionManager:
             project=project,
             action_date=action_date
         ).replace("action to @incubating.md", "to @incubating.md")
+
+    def complete_action(
+        self,
+        file_path: str,
+        line_number: int,
+        completion_date: str | None = None
+    ) -> str:
+        """
+        Complete an action by marking it done and moving to completed.md.
+
+        Args:
+            file_path: Relative path to action file (e.g., "contexts/@macbook.md" or "@waiting.md")
+            line_number: Line number of action to complete (1-indexed as shown in editors)
+            completion_date: Optional completion date (YYYY-MM-DD), defaults to today
+
+        Returns:
+            Success or error message
+        """
+        repo_path = Path(self._config.get_repo_path())
+        actions_base = repo_path / "docs" / "execution_system" / "00k-next-actions"
+
+        # Resolve file path
+        if file_path.startswith("@"):
+            # Special state file in base directory
+            source_file = actions_base / file_path
+        elif file_path.startswith("contexts/"):
+            # Context file in contexts subdirectory
+            source_file = actions_base / file_path
+        else:
+            return f"Error: Invalid file path '{file_path}'. Must start with '@' or 'contexts/'"
+
+        if not source_file.exists():
+            return f"Error: File {file_path} does not exist"
+
+        # Read source file
+        with open(source_file, 'r') as f:
+            lines = f.readlines()
+
+        # Validate line number (convert from 1-indexed to 0-indexed)
+        line_idx = line_number - 1
+        if line_idx < 0 or line_idx >= len(lines):
+            return f"Error: Line number {line_number} is out of range"
+
+        action_line = lines[line_idx]
+
+        # Validate it's an incomplete action
+        if not action_line.strip().startswith("- [ ]"):
+            return f"Error: Line {line_number} is not an incomplete action"
+
+        # Extract action text (everything after "- [ ] ")
+        action_text = action_line.strip()[6:]  # Remove "- [ ] "
+
+        # Build completed action line
+        completion_date_str = completion_date if completion_date else date.today().strftime("%Y-%m-%d")
+        completed_line = f"- [x] {completion_date_str} {action_text}\n"
+
+        # Get completed file path
+        completed_file = actions_base / "completed.md"
+
+        # Read completed file
+        with open(completed_file, 'r') as f:
+            completed_lines = f.readlines()
+
+        # Find end of YAML frontmatter in completed file
+        yaml_end_idx = 0
+        in_yaml = False
+        for i, line in enumerate(completed_lines):
+            if line.strip() == '---':
+                if not in_yaml:
+                    in_yaml = True
+                else:
+                    yaml_end_idx = i + 1
+                    break
+
+        # Add empty line after YAML if not present
+        if yaml_end_idx < len(completed_lines) and completed_lines[yaml_end_idx].strip() != "":
+            completed_lines.insert(yaml_end_idx, "\n")
+            yaml_end_idx += 1
+
+        # Insert completed action at top of completed file
+        completed_lines.insert(yaml_end_idx, completed_line)
+
+        # Write updated completed file
+        with open(completed_file, 'w') as f:
+            f.writelines(completed_lines)
+
+        # Remove action from source file
+        lines.pop(line_idx)
+
+        # Write updated source file
+        with open(source_file, 'w') as f:
+            f.writelines(lines)
+
+        return f"✓ Successfully completed action from {file_path}"
