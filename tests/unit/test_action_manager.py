@@ -331,8 +331,54 @@ last_reviewed: 2025-10-20
         Test adding to waiting with defer date.
 
         Given: @waiting.md exists
-        When: Adding item with defer date
+        When: Adding item with defer date and project
         Then: Item includes defer:YYYY-MM-DD tag
+        """
+        # Given
+        repo_path = tmp_path / "repo"
+        actions_dir = repo_path / "docs" / "execution_system" / "00k-next-actions"
+        actions_dir.mkdir(parents=True)
+
+        waiting_file = actions_dir / "@waiting.md"
+        waiting_file.write_text("""---
+title: Waiting For
+last_reviewed: 2025-10-20
+---
+
+""")
+
+        config_file = tmp_path / "config.json"
+        config_file.write_text(json.dumps({
+            "execution_system_repo_path": str(repo_path),
+            "areas": [{"name": "Health", "kebab": "health"}]
+        }))
+
+        # Create dummy project for validation
+        projects_dir = repo_path / "docs" / "execution_system" / "10k-projects" / "active" / "health"
+        projects_dir.mkdir(parents=True)
+        (projects_dir / "shipment-project.md").write_text("---\narea: Health\n---\n")
+
+        config = ConfigManager(str(config_file))
+        manager = ActionManager(config)
+
+        # When
+        result = manager.add_to_waiting(
+            text="Wait for delayed shipment",
+            project="shipment-project",
+            defer="2025-12-01"
+        )
+
+        # Then
+        content = waiting_file.read_text()
+        assert "defer:2025-12-01" in content
+
+    def test_error_when_waiting_missing_project(self, tmp_path):
+        """
+        Test that adding to waiting without project returns error.
+
+        Given: @waiting.md exists
+        When: Adding item without project parameter
+        Then: Returns error about missing project
         """
         # Given
         repo_path = tmp_path / "repo"
@@ -358,13 +404,13 @@ last_reviewed: 2025-10-20
 
         # When
         result = manager.add_to_waiting(
-            text="Wait for delayed shipment",
-            defer="2025-12-01"
+            text="Wait for something"
         )
 
         # Then
-        content = waiting_file.read_text()
-        assert "defer:2025-12-01" in content
+        assert "Error" in result
+        assert "project" in result.lower()
+        assert "required" in result.lower()
 
 
 class TestActionManagerAddToDeferred:

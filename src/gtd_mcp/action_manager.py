@@ -164,7 +164,7 @@ class ActionManager:
 
         Args:
             text: Action text
-            project: Optional project filename in kebab-case
+            project: Required project filename in kebab-case
             due: Optional due date (YYYY-MM-DD)
             defer: Optional defer date (YYYY-MM-DD)
             action_date: Optional creation date (YYYY-MM-DD), defaults to today
@@ -172,6 +172,10 @@ class ActionManager:
         Returns:
             Success or error message
         """
+        # Validate that project is provided
+        if not project:
+            return "Error: Project is required for waiting items"
+
         result = self.add_action(
             text=text,
             context="@waiting",

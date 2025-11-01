@@ -652,7 +652,7 @@ def add_to_waiting_handler(params: dict, config_path: str | None = None) -> str:
     Handle add_to_waiting tool invocation.
 
     Args:
-        params: Tool parameters (text, project?, due?, defer?, action_date?)
+        params: Tool parameters (text, project, due?, defer?, action_date?)
         config_path: Optional path to config file (for testing)
 
     Returns:
@@ -663,12 +663,17 @@ def add_to_waiting_handler(params: dict, config_path: str | None = None) -> str:
         manager = ActionManager(config)
 
         text = params.get("text")
+        project = params.get("project")
+
         if not text:
             return "Error: Missing required parameter (text)"
 
+        if not project:
+            return "Error: Missing required parameter (project)"
+
         return manager.add_to_waiting(
             text=text,
-            project=params.get("project"),
+            project=project,
             due=params.get("due"),
             defer=params.get("defer"),
             action_date=params.get("action_date")
@@ -1208,7 +1213,7 @@ async def main():
             ),
             Tool(
                 name="add_to_waiting",
-                description="Add an item to the @waiting.md list. Use for things waiting on others or external events.",
+                description="Add an item to the @waiting.md list. Use for things waiting on others or external events. Requires a project to be specified.",
                 inputSchema={
                     "type": "object",
                     "properties": {
@@ -1218,7 +1223,7 @@ async def main():
                         },
                         "project": {
                             "type": "string",
-                            "description": "Optional project filename in kebab-case"
+                            "description": "Project filename in kebab-case (required)"
                         },
                         "due": {
                             "type": "string",
@@ -1236,7 +1241,7 @@ async def main():
                             "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
                         }
                     },
-                    "required": ["text"]
+                    "required": ["text", "project"]
                 }
             ),
             Tool(
