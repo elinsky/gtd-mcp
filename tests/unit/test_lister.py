@@ -239,7 +239,7 @@ type: coordination
 
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": str(repo_path),
+            "execution_system_repo_path": str(repo_path),
             "areas": [
                 {"name": "Health", "kebab": "health"},
                 {"name": "Career", "kebab": "career"},
@@ -291,7 +291,7 @@ type: standard
 
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": str(repo_path),
+            "execution_system_repo_path": str(repo_path),
             "areas": [
                 {"name": "Health", "kebab": "health"},
                 {"name": "Career", "kebab": "career"},
@@ -346,7 +346,7 @@ type: standard
 
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": str(repo_path),
+            "execution_system_repo_path": str(repo_path),
             "areas": [
                 {"name": "Health", "kebab": "health"},
                 {"name": "Career", "kebab": "career"},
@@ -410,7 +410,7 @@ type: standard
 
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": str(repo_path),
+            "execution_system_repo_path": str(repo_path),
             "areas": [{"name": "Health", "kebab": "health"}],
         }
         config_file.write_text(json.dumps(config_data))
@@ -449,7 +449,7 @@ type: standard
 
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": str(repo_path),
+            "execution_system_repo_path": str(repo_path),
             "areas": [{"name": "Health", "kebab": "health"}],
         }
         config_file.write_text(json.dumps(config_data))
@@ -497,7 +497,7 @@ type: standard
 
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": str(repo_path),
+            "execution_system_repo_path": str(repo_path),
             "areas": [
                 {"name": "Health", "kebab": "health"},
                 {"name": "Career", "kebab": "career"},
@@ -545,7 +545,7 @@ type: standard
 
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": str(repo_path),
+            "execution_system_repo_path": str(repo_path),
             "areas": [{"name": "Health", "kebab": "health"}],
         }
         config_file.write_text(json.dumps(config_data))
@@ -610,7 +610,7 @@ type: standard
 
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": str(repo_path),
+            "execution_system_repo_path": str(repo_path),
             "areas": [{"name": "Health", "kebab": "health"}],
         }
         config_file.write_text(json.dumps(config_data))
@@ -664,7 +664,7 @@ type: standard
 
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": str(repo_path),
+            "execution_system_repo_path": str(repo_path),
             "areas": [
                 {"name": "Health", "kebab": "health"},
                 {"name": "Career", "kebab": "career"},

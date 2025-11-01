@@ -156,7 +156,7 @@ type: standard
 
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": str(repo_path),
+            "execution_system_repo_path": str(repo_path),
             "areas": [
                 {"name": "Career", "kebab": "career"},
                 {"name": "Health", "kebab": "health"},
@@ -217,7 +217,7 @@ last_reviewed: 2025-10-22
 
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": str(repo_path),
+            "execution_system_repo_path": str(repo_path),
             "areas": [{"name": "Career", "kebab": "career"}],
         }
         config_file.write_text(json.dumps(config_data))
@@ -273,7 +273,7 @@ type: standard
 
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": str(repo_path),
+            "execution_system_repo_path": str(repo_path),
             "areas": [{"name": "Career", "kebab": "career"}],
         }
         config_file.write_text(json.dumps(config_data))
@@ -332,7 +332,7 @@ type: standard
 
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": str(repo_path),
+            "execution_system_repo_path": str(repo_path),
             "areas": [{"name": "Career", "kebab": "career"}],
         }
         config_file.write_text(json.dumps(config_data))
@@ -372,7 +372,7 @@ last_reviewed: 2025-10-22
 
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": str(repo_path),
+            "execution_system_repo_path": str(repo_path),
             "areas": [{"name": "Career", "kebab": "career"}],
         }
         config_file.write_text(json.dumps(config_data))
@@ -446,7 +446,7 @@ type: standard
 
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": str(repo_path),
+            "execution_system_repo_path": str(repo_path),
             "areas": [{"name": "Career", "kebab": "career"}],
         }
         config_file.write_text(json.dumps(config_data))
@@ -512,7 +512,7 @@ type: standard
 
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": str(repo_path),
+            "execution_system_repo_path": str(repo_path),
             "areas": [{"name": "Career", "kebab": "career"}],
         }
         config_file.write_text(json.dumps(config_data))

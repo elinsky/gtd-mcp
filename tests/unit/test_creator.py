@@ -114,7 +114,7 @@ class TestProjectCreatorGenerateFrontmatter:
         # Given
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": str(tmp_path),
+            "execution_system_repo_path": str(tmp_path),
             "areas": [{"name": "Health", "kebab": "health"}],
         }
         config_file.write_text(json.dumps(config_data))
@@ -148,7 +148,7 @@ class TestProjectCreatorGenerateFrontmatter:
         # Given
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": str(tmp_path),
+            "execution_system_repo_path": str(tmp_path),
             "areas": [{"name": "Health", "kebab": "health"}],
         }
         config_file.write_text(json.dumps(config_data))
@@ -178,7 +178,7 @@ class TestProjectCreatorGenerateFrontmatter:
         # Given
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": str(tmp_path),
+            "execution_system_repo_path": str(tmp_path),
             "areas": [{"name": "Health", "kebab": "health"}],
         }
         config_file.write_text(json.dumps(config_data))
@@ -208,7 +208,7 @@ class TestProjectCreatorGenerateFrontmatter:
         # Given
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": str(tmp_path),
+            "execution_system_repo_path": str(tmp_path),
             "areas": [{"name": "Health", "kebab": "health"}],
         }
         config_file.write_text(json.dumps(config_data))
@@ -239,7 +239,7 @@ class TestProjectCreatorGenerateFrontmatter:
         # Given
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": str(tmp_path),
+            "execution_system_repo_path": str(tmp_path),
             "areas": [{"name": "Health", "kebab": "health"}],
         }
         config_file.write_text(json.dumps(config_data))
@@ -274,7 +274,7 @@ class TestProjectCreatorCreateProject:
         repo_path = tmp_path / "repo"
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": str(repo_path),
+            "execution_system_repo_path": str(repo_path),
             "areas": [{"name": "Health", "kebab": "health"}],
         }
         config_file.write_text(json.dumps(config_data))
@@ -306,7 +306,7 @@ class TestProjectCreatorCreateProject:
         repo_path = tmp_path / "repo"
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": str(repo_path),
+            "execution_system_repo_path": str(repo_path),
             "areas": [{"name": "Career", "kebab": "career"}],
         }
         config_file.write_text(json.dumps(config_data))
@@ -337,7 +337,7 @@ class TestProjectCreatorCreateProject:
         repo_path = tmp_path / "repo"
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": str(repo_path),
+            "execution_system_repo_path": str(repo_path),
             "areas": [{"name": "Health", "kebab": "health"}],
         }
         config_file.write_text(json.dumps(config_data))

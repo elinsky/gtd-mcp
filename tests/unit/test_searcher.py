@@ -52,7 +52,7 @@ Daily meditation routine.
 
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": str(repo_path),
+            "execution_system_repo_path": str(repo_path),
             "areas": [{"name": "Health", "kebab": "health"}],
         }
         config_file.write_text(json.dumps(config_data))
@@ -110,7 +110,7 @@ This is about JavaScript development.
 
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": str(repo_path),
+            "execution_system_repo_path": str(repo_path),
             "areas": [{"name": "Mission", "kebab": "mission"}],
         }
         config_file.write_text(json.dumps(config_data))
@@ -153,7 +153,7 @@ Content with YoGa mentioned.
 
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": str(repo_path),
+            "execution_system_repo_path": str(repo_path),
             "areas": [{"name": "Health", "kebab": "health"}],
         }
         config_file.write_text(json.dumps(config_data))
@@ -205,7 +205,7 @@ Fitness ideas.
 
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": str(repo_path),
+            "execution_system_repo_path": str(repo_path),
             "areas": [{"name": "Health", "kebab": "health"}],
         }
         config_file.write_text(json.dumps(config_data))
@@ -257,7 +257,7 @@ Content about goals.
 
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": str(repo_path),
+            "execution_system_repo_path": str(repo_path),
             "areas": [
                 {"name": "Health", "kebab": "health"},
                 {"name": "Mission", "kebab": "mission"}
@@ -300,7 +300,7 @@ Content here.
 
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": str(repo_path),
+            "execution_system_repo_path": str(repo_path),
             "areas": [{"name": "Health", "kebab": "health"}],
         }
         config_file.write_text(json.dumps(config_data))
@@ -343,7 +343,7 @@ last_reviewed: 2025-10-30
 
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": str(repo_path),
+            "execution_system_repo_path": str(repo_path),
             "areas": [{"name": "Health", "kebab": "health"}],
         }
         config_file.write_text(json.dumps(config_data))
@@ -385,7 +385,7 @@ last_reviewed: 2025-10-30
 
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": str(repo_path),
+            "execution_system_repo_path": str(repo_path),
             "areas": [{"name": "Health", "kebab": "health"}],
         }
         config_file.write_text(json.dumps(config_data))
@@ -426,7 +426,7 @@ last_reviewed: 2025-10-30
 
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": str(repo_path),
+            "execution_system_repo_path": str(repo_path),
             "areas": [{"name": "Health", "kebab": "health"}],
         }
         config_file.write_text(json.dumps(config_data))
@@ -466,7 +466,7 @@ last_reviewed: 2025-10-30
 
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": str(repo_path),
+            "execution_system_repo_path": str(repo_path),
             "areas": [{"name": "Health", "kebab": "health"}],
         }
         config_file.write_text(json.dumps(config_data))
@@ -514,7 +514,7 @@ last_reviewed: 2025-10-30
 
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": str(repo_path),
+            "execution_system_repo_path": str(repo_path),
             "areas": [{"name": "Health", "kebab": "health"}],
         }
         config_file.write_text(json.dumps(config_data))
@@ -553,7 +553,7 @@ last_reviewed: 2025-10-30
 
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": str(repo_path),
+            "execution_system_repo_path": str(repo_path),
             "areas": [{"name": "Health", "kebab": "health"}],
         }
         config_file.write_text(json.dumps(config_data))

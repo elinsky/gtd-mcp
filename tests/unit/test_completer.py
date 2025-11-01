@@ -19,7 +19,7 @@ class TestProjectCompleterFindActiveProject:
         # Given
         config_file = tmp_path / "config.json"
         config_file.write_text("""{
-            "gtd_repo_path": "%s",
+            "execution_system_repo_path": "%s",
             "areas": [
                 {"name": "Health", "kebab": "health"}
             ]
@@ -58,7 +58,7 @@ last_reviewed: 2025-10-20
         # Given
         config_file = tmp_path / "config.json"
         config_file.write_text("""{
-            "gtd_repo_path": "%s",
+            "execution_system_repo_path": "%s",
             "areas": [
                 {"name": "Health", "kebab": "health"}
             ]
@@ -86,7 +86,7 @@ last_reviewed: 2025-10-20
         # Given
         config_file = tmp_path / "config.json"
         config_file.write_text("""{
-            "gtd_repo_path": "%s",
+            "execution_system_repo_path": "%s",
             "areas": [
                 {"name": "Health", "kebab": "health"}
             ]
@@ -120,7 +120,7 @@ title: Old Project
         # Given
         config_file = tmp_path / "config.json"
         config_file.write_text("""{
-            "gtd_repo_path": "%s",
+            "execution_system_repo_path": "%s",
             "areas": [
                 {"name": "Health", "kebab": "health"}
             ]
@@ -154,7 +154,7 @@ title: Future Project
         # Given
         config_file = tmp_path / "config.json"
         config_file.write_text("""{
-            "gtd_repo_path": "%s",
+            "execution_system_repo_path": "%s",
             "areas": [
                 {"name": "Health", "kebab": "health"},
                 {"name": "Career", "kebab": "career"}
@@ -201,7 +201,7 @@ class TestProjectCompleterCheck0kBlockers:
         # Given
         config_file = tmp_path / "config.json"
         config_file.write_text("""{
-            "gtd_repo_path": "%s",
+            "execution_system_repo_path": "%s",
             "areas": [{"name": "Health", "kebab": "health"}]
         }""" % str(tmp_path))
 
@@ -234,7 +234,7 @@ title: Waiting For
         # Given
         config_file = tmp_path / "config.json"
         config_file.write_text("""{
-            "gtd_repo_path": "%s",
+            "execution_system_repo_path": "%s",
             "areas": [{"name": "Health", "kebab": "health"}]
         }""" % str(tmp_path))
 
@@ -270,7 +270,7 @@ title: Waiting For
         # Given
         config_file = tmp_path / "config.json"
         config_file.write_text("""{
-            "gtd_repo_path": "%s",
+            "execution_system_repo_path": "%s",
             "areas": [{"name": "Health", "kebab": "health"}]
         }""" % str(tmp_path))
 
@@ -305,7 +305,7 @@ title: Incubating
         # Given
         config_file = tmp_path / "config.json"
         config_file.write_text("""{
-            "gtd_repo_path": "%s",
+            "execution_system_repo_path": "%s",
             "areas": [{"name": "Health", "kebab": "health"}]
         }""" % str(tmp_path))
 
@@ -340,7 +340,7 @@ title: Deferred
         # Given
         config_file = tmp_path / "config.json"
         config_file.write_text("""{
-            "gtd_repo_path": "%s",
+            "execution_system_repo_path": "%s",
             "areas": [{"name": "Health", "kebab": "health"}]
         }""" % str(tmp_path))
 
@@ -375,7 +375,7 @@ title: Personal Context
         # Given
         config_file = tmp_path / "config.json"
         config_file.write_text("""{
-            "gtd_repo_path": "%s",
+            "execution_system_repo_path": "%s",
             "areas": [{"name": "Health", "kebab": "health"}]
         }""" % str(tmp_path))
 
@@ -426,7 +426,7 @@ title: Personal
         # Given
         config_file = tmp_path / "config.json"
         config_file.write_text("""{
-            "gtd_repo_path": "%s",
+            "execution_system_repo_path": "%s",
             "areas": [{"name": "Health", "kebab": "health"}]
         }""" % str(tmp_path))
 
@@ -460,7 +460,7 @@ title: Completed
         # Given
         config_file = tmp_path / "config.json"
         config_file.write_text("""{
-            "gtd_repo_path": "%s",
+            "execution_system_repo_path": "%s",
             "areas": [{"name": "Health", "kebab": "health"}]
         }""" % str(tmp_path))
 
@@ -498,7 +498,7 @@ class TestProjectCompleterParseFrontmatter:
         # Given
         config_file = tmp_path / "config.json"
         config_file.write_text("""{
-            "gtd_repo_path": "%s",
+            "execution_system_repo_path": "%s",
             "areas": [{"name": "Health", "kebab": "health"}]
         }""" % str(tmp_path))
 
@@ -540,7 +540,7 @@ due: 2025-12-31
         # Given
         config_file = tmp_path / "config.json"
         config_file.write_text("""{
-            "gtd_repo_path": "%s",
+            "execution_system_repo_path": "%s",
             "areas": [{"name": "Health", "kebab": "health"}]
         }""" % str(tmp_path))
 
@@ -577,7 +577,7 @@ last_reviewed: 2025-10-22
         # Given
         config_file = tmp_path / "config.json"
         config_file.write_text("""{
-            "gtd_repo_path": "%s",
+            "execution_system_repo_path": "%s",
             "areas": [{"name": "Health", "kebab": "health"}]
         }""" % str(tmp_path))
 
@@ -617,7 +617,7 @@ class TestProjectCompleterAddCompletedDate:
         # Given
         config_file = tmp_path / "config.json"
         config_file.write_text("""{
-            "gtd_repo_path": "%s",
+            "execution_system_repo_path": "%s",
             "areas": [{"name": "Health", "kebab": "health"}]
         }""" % str(tmp_path))
 
@@ -649,7 +649,7 @@ class TestProjectCompleterAddCompletedDate:
         # Given
         config_file = tmp_path / "config.json"
         config_file.write_text("""{
-            "gtd_repo_path": "%s",
+            "execution_system_repo_path": "%s",
             "areas": [{"name": "Health", "kebab": "health"}]
         }""" % str(tmp_path))
 
@@ -687,7 +687,7 @@ class TestProjectCompleterAddCompletedDate:
         # Given
         config_file = tmp_path / "config.json"
         config_file.write_text("""{
-            "gtd_repo_path": "%s",
+            "execution_system_repo_path": "%s",
             "areas": [{"name": "Health", "kebab": "health"}]
         }""" % str(tmp_path))
 
@@ -720,7 +720,7 @@ class TestProjectCompleterAddCompletedDate:
         # Given
         config_file = tmp_path / "config.json"
         config_file.write_text("""{
-            "gtd_repo_path": "%s",
+            "execution_system_repo_path": "%s",
             "areas": [{"name": "Health", "kebab": "health"}]
         }""" % str(tmp_path))
 
@@ -756,7 +756,7 @@ class TestProjectCompleterGenerateFrontmatterYaml:
         # Given
         config_file = tmp_path / "config.json"
         config_file.write_text("""{
-            "gtd_repo_path": "%s",
+            "execution_system_repo_path": "%s",
             "areas": [{"name": "Health", "kebab": "health"}]
         }""" % str(tmp_path))
 
@@ -793,7 +793,7 @@ class TestProjectCompleterGenerateFrontmatterYaml:
         # Given
         config_file = tmp_path / "config.json"
         config_file.write_text("""{
-            "gtd_repo_path": "%s",
+            "execution_system_repo_path": "%s",
             "areas": [{"name": "Health", "kebab": "health"}]
         }""" % str(tmp_path))
 
@@ -831,7 +831,7 @@ class TestProjectCompleterGenerateFrontmatterYaml:
         # Given
         config_file = tmp_path / "config.json"
         config_file.write_text("""{
-            "gtd_repo_path": "%s",
+            "execution_system_repo_path": "%s",
             "areas": [{"name": "Health", "kebab": "health"}]
         }""" % str(tmp_path))
 
@@ -866,7 +866,7 @@ class TestProjectCompleterCompleteProject:
         # Given
         config_file = tmp_path / "config.json"
         config_file.write_text("""{
-            "gtd_repo_path": "%s",
+            "execution_system_repo_path": "%s",
             "areas": [{"name": "Health", "kebab": "health"}]
         }""" % str(tmp_path))
 
@@ -912,7 +912,7 @@ last_reviewed: 2025-10-22
         # Given
         config_file = tmp_path / "config.json"
         config_file.write_text("""{
-            "gtd_repo_path": "%s",
+            "execution_system_repo_path": "%s",
             "areas": [{"name": "Health", "kebab": "health"}]
         }""" % str(tmp_path))
 
@@ -954,7 +954,7 @@ last_reviewed: 2025-10-22
         # Given
         config_file = tmp_path / "config.json"
         config_file.write_text("""{
-            "gtd_repo_path": "%s",
+            "execution_system_repo_path": "%s",
             "areas": [{"name": "Health", "kebab": "health"}]
         }""" % str(tmp_path))
 
@@ -979,7 +979,7 @@ last_reviewed: 2025-10-22
         # Given
         config_file = tmp_path / "config.json"
         config_file.write_text("""{
-            "gtd_repo_path": "%s",
+            "execution_system_repo_path": "%s",
             "areas": [{"name": "Health", "kebab": "health"}]
         }""" % str(tmp_path))
 

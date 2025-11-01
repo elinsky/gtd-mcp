@@ -49,7 +49,7 @@ type: goal
 
         config_file = tmp_path / "config.json"
         config_file.write_text(json.dumps({
-            "gtd_repo_path": str(repo_path),
+            "execution_system_repo_path": str(repo_path),
             "areas": [
                 {"name": "Health", "kebab": "health"},
                 {"name": "Learning", "kebab": "learning"}
@@ -110,7 +110,7 @@ Just supporting material
 
         config_file = tmp_path / "config.json"
         config_file.write_text(json.dumps({
-            "gtd_repo_path": str(repo_path),
+            "execution_system_repo_path": str(repo_path),
             "areas": [{"name": "Career", "kebab": "career"}]
         }))
 
@@ -149,7 +149,7 @@ started: 2025-10-01
 
         config_file = tmp_path / "config.json"
         config_file.write_text(json.dumps({
-            "gtd_repo_path": str(repo_path),
+            "execution_system_repo_path": str(repo_path),
             "areas": [{"name": "Career", "kebab": "career"}]
         }))
 
@@ -182,7 +182,7 @@ started: 2025-10-01
 
         config_file = tmp_path / "config.json"
         config_file.write_text(json.dumps({
-            "gtd_repo_path": str(repo_path),
+            "execution_system_repo_path": str(repo_path),
             "areas": [{"name": "Health", "kebab": "health"}]
         }))
 
@@ -221,7 +221,7 @@ started: 2025-09-15
 
         config_file = tmp_path / "config.json"
         config_file.write_text(json.dumps({
-            "gtd_repo_path": str(repo_path),
+            "execution_system_repo_path": str(repo_path),
             "areas": [{"name": "Health", "kebab": "health"}]
         }))
 

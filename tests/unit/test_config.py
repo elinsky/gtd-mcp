@@ -22,7 +22,7 @@ class TestConfigManagerInit:
         # Given
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": "/path/to/repo",
+            "execution_system_repo_path": "/path/to/repo",
             "areas": [
                 {"name": "Health", "kebab": "health"},
                 {"name": "Career", "kebab": "career"},
@@ -67,13 +67,13 @@ class TestConfigManagerInit:
         with pytest.raises(json.JSONDecodeError):
             ConfigManager(str(config_file))
 
-    def test_fail_on_missing_gtd_repo_path(self, tmp_path):
+    def test_fail_on_missing_execution_system_repo_path(self, tmp_path):
         """
-        Test failure when gtd_repo_path field is missing.
+        Test failure when execution_system_repo_path field is missing.
 
-        Given: Config file without gtd_repo_path field
+        Given: Config file without execution_system_repo_path field
         When: Initializing ConfigManager
-        Then: Raises ValueError with 'gtd_repo_path' message
+        Then: Raises ValueError with 'execution_system_repo_path' message
         """
         # Given
         config_file = tmp_path / "config.json"
@@ -83,7 +83,7 @@ class TestConfigManagerInit:
         config_file.write_text(json.dumps(config_data))
 
         # When/Then
-        with pytest.raises(ValueError, match="gtd_repo_path"):
+        with pytest.raises(ValueError, match="execution_system_repo_path"):
             ConfigManager(str(config_file))
 
     def test_fail_on_missing_areas(self, tmp_path):
@@ -97,7 +97,7 @@ class TestConfigManagerInit:
         # Given
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": "/path/to/repo",
+            "execution_system_repo_path": "/path/to/repo",
         }
         config_file.write_text(json.dumps(config_data))
 
@@ -116,7 +116,7 @@ class TestConfigManagerInit:
         # Given
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": "/path/to/repo",
+            "execution_system_repo_path": "/path/to/repo",
             "areas": [],
         }
         config_file.write_text(json.dumps(config_data))
@@ -140,7 +140,7 @@ class TestConfigManagerGetRepoPath:
         # Given
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": "/path/to/repo",
+            "execution_system_repo_path": "/path/to/repo",
             "areas": [{"name": "Health", "kebab": "health"}],
         }
         config_file.write_text(json.dumps(config_data))
@@ -167,7 +167,7 @@ class TestConfigManagerGetAreas:
         # Given
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": "/path/to/repo",
+            "execution_system_repo_path": "/path/to/repo",
             "areas": [
                 {"name": "Health", "kebab": "health"},
                 {"name": "Career", "kebab": "career"},
@@ -201,7 +201,7 @@ class TestConfigManagerFindAreaKebab:
         # Given
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": "/path/to/repo",
+            "execution_system_repo_path": "/path/to/repo",
             "areas": [{"name": "Health", "kebab": "health"}],
         }
         config_file.write_text(json.dumps(config_data))
@@ -224,7 +224,7 @@ class TestConfigManagerFindAreaKebab:
         # Given
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": "/path/to/repo",
+            "execution_system_repo_path": "/path/to/repo",
             "areas": [{"name": "Health", "kebab": "health"}],
         }
         config_file.write_text(json.dumps(config_data))
@@ -247,7 +247,7 @@ class TestConfigManagerFindAreaKebab:
         # Given
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": "/path/to/repo",
+            "execution_system_repo_path": "/path/to/repo",
             "areas": [{"name": "Health", "kebab": "health"}],
         }
         config_file.write_text(json.dumps(config_data))
@@ -270,7 +270,7 @@ class TestConfigManagerFindAreaKebab:
         # Given
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": "/path/to/repo",
+            "execution_system_repo_path": "/path/to/repo",
             "areas": [
                 {"name": "Personal Growth Systems", "kebab": "personal-growth-systems"}
             ],
@@ -295,7 +295,7 @@ class TestConfigManagerFindAreaKebab:
         # Given
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": "/path/to/repo",
+            "execution_system_repo_path": "/path/to/repo",
             "areas": [{"name": "Health", "kebab": "health"}],
         }
         config_file.write_text(json.dumps(config_data))

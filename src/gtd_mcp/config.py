@@ -38,8 +38,8 @@ class ConfigManager:
         Raises:
             ValueError: If configuration is invalid
         """
-        if "gtd_repo_path" not in self._config:
-            raise ValueError("Configuration missing required field: gtd_repo_path")
+        if "execution_system_repo_path" not in self._config:
+            raise ValueError("Configuration missing required field: execution_system_repo_path")
 
         if "areas" not in self._config:
             raise ValueError("Configuration missing required field: areas")
@@ -54,7 +54,7 @@ class ConfigManager:
         Returns:
             Absolute path to execution system repository
         """
-        return self._config["gtd_repo_path"]
+        return self._config["execution_system_repo_path"]
 
     def get_areas(self) -> list[dict[str, str]]:
         """

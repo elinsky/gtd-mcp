@@ -23,7 +23,7 @@ class TestAreaListerListAreas:
         # Given
         config_file = tmp_path / "config.json"
         config_file.write_text(json.dumps({
-            "gtd_repo_path": str(tmp_path / "repo"),
+            "execution_system_repo_path": str(tmp_path / "repo"),
             "areas": [
                 {"name": "Health", "kebab": "health"},
                 {"name": "Career", "kebab": "career"},
@@ -55,7 +55,7 @@ class TestAreaListerListAreas:
         # Given
         config_file = tmp_path / "config.json"
         config_file.write_text(json.dumps({
-            "gtd_repo_path": str(tmp_path / "repo"),
+            "execution_system_repo_path": str(tmp_path / "repo"),
             "areas": [
                 {"name": "Health", "kebab": "health"}
             ]
@@ -83,7 +83,7 @@ class TestAreaListerListAreas:
         # Given
         config_file = tmp_path / "config.json"
         config_file.write_text(json.dumps({
-            "gtd_repo_path": str(tmp_path / "repo"),
+            "execution_system_repo_path": str(tmp_path / "repo"),
             "areas": [
                 {"name": "Zebra", "kebab": "zebra"},
                 {"name": "Apple", "kebab": "apple"},

@@ -23,7 +23,7 @@ class TestProjectValidatorValidateArea:
         # Given
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": "/path/to/repo",
+            "execution_system_repo_path": "/path/to/repo",
             "areas": [{"name": "Health", "kebab": "health"}],
         }
         config_file.write_text(json.dumps(config_data))
@@ -48,7 +48,7 @@ class TestProjectValidatorValidateArea:
         # Given
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": "/path/to/repo",
+            "execution_system_repo_path": "/path/to/repo",
             "areas": [{"name": "Health", "kebab": "health"}],
         }
         config_file.write_text(json.dumps(config_data))
@@ -73,7 +73,7 @@ class TestProjectValidatorValidateArea:
         # Given
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": "/path/to/repo",
+            "execution_system_repo_path": "/path/to/repo",
             "areas": [
                 {"name": "Health", "kebab": "health"},
                 {"name": "Career", "kebab": "career"},
@@ -104,7 +104,7 @@ class TestProjectValidatorValidateArea:
         # Given
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": "/path/to/repo",
+            "execution_system_repo_path": "/path/to/repo",
             "areas": [
                 {"name": "Personal Growth Systems", "kebab": "personal-growth-systems"}
             ],
@@ -141,7 +141,7 @@ class TestProjectValidatorCheckDuplicates:
 
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": str(repo_path),
+            "execution_system_repo_path": str(repo_path),
             "areas": [{"name": "Health", "kebab": "health"}],
         }
         config_file.write_text(json.dumps(config_data))
@@ -175,7 +175,7 @@ class TestProjectValidatorCheckDuplicates:
 
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": str(repo_path),
+            "execution_system_repo_path": str(repo_path),
             "areas": [{"name": "Health", "kebab": "health"}],
         }
         config_file.write_text(json.dumps(config_data))
@@ -209,7 +209,7 @@ class TestProjectValidatorCheckDuplicates:
 
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": str(repo_path),
+            "execution_system_repo_path": str(repo_path),
             "areas": [{"name": "Career", "kebab": "career"}],
         }
         config_file.write_text(json.dumps(config_data))
@@ -243,7 +243,7 @@ class TestProjectValidatorCheckDuplicates:
 
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": str(repo_path),
+            "execution_system_repo_path": str(repo_path),
             "areas": [{"name": "Health", "kebab": "health"}],
         }
         config_file.write_text(json.dumps(config_data))
@@ -277,7 +277,7 @@ class TestProjectValidatorCheckDuplicates:
 
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": str(repo_path),
+            "execution_system_repo_path": str(repo_path),
             "areas": [{"name": "Finance", "kebab": "finance"}],
         }
         config_file.write_text(json.dumps(config_data))
@@ -311,7 +311,7 @@ class TestProjectValidatorCheckDuplicates:
 
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": str(repo_path),
+            "execution_system_repo_path": str(repo_path),
             "areas": [{"name": "Health", "kebab": "health"}],
         }
         config_file.write_text(json.dumps(config_data))
@@ -340,7 +340,7 @@ class TestProjectValidatorValidateDueDate:
         # Given
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": "/path/to/repo",
+            "execution_system_repo_path": "/path/to/repo",
             "areas": [{"name": "Health", "kebab": "health"}],
         }
         config_file.write_text(json.dumps(config_data))
@@ -365,7 +365,7 @@ class TestProjectValidatorValidateDueDate:
         # Given
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": "/path/to/repo",
+            "execution_system_repo_path": "/path/to/repo",
             "areas": [{"name": "Health", "kebab": "health"}],
         }
         config_file.write_text(json.dumps(config_data))
@@ -391,7 +391,7 @@ class TestProjectValidatorValidateDueDate:
         # Given
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": "/path/to/repo",
+            "execution_system_repo_path": "/path/to/repo",
             "areas": [{"name": "Health", "kebab": "health"}],
         }
         config_file.write_text(json.dumps(config_data))
@@ -416,7 +416,7 @@ class TestProjectValidatorValidateDueDate:
         # Given
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": "/path/to/repo",
+            "execution_system_repo_path": "/path/to/repo",
             "areas": [{"name": "Health", "kebab": "health"}],
         }
         config_file.write_text(json.dumps(config_data))
@@ -441,7 +441,7 @@ class TestProjectValidatorValidateDueDate:
         # Given
         config_file = tmp_path / "config.json"
         config_data = {
-            "gtd_repo_path": "/path/to/repo",
+            "execution_system_repo_path": "/path/to/repo",
             "areas": [{"name": "Health", "kebab": "health"}],
         }
         config_file.write_text(json.dumps(config_data))

@@ -1,5 +1,5 @@
 {
-  "gtd_repo_path": "/absolute/path/to/your/gtd-repo",
+  "execution_system_repo_path": "/absolute/path/to/your/gtd-repo",
   "areas": [
     {"name": "Health", "kebab": "health"},
     {"name": "Learning", "kebab": "learning"},
