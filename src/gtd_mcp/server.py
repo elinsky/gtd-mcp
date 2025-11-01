@@ -688,7 +688,7 @@ def add_to_deferred_handler(params: dict, config_path: str | None = None) -> str
     Handle add_to_deferred tool invocation.
 
     Args:
-        params: Tool parameters (text, project?, defer?, action_date?)
+        params: Tool parameters (text, project, defer?, action_date?)
         config_path: Optional path to config file (for testing)
 
     Returns:
@@ -699,12 +699,17 @@ def add_to_deferred_handler(params: dict, config_path: str | None = None) -> str
         manager = ActionManager(config)
 
         text = params.get("text")
+        project = params.get("project")
+
         if not text:
             return "Error: Missing required parameter (text)"
 
+        if not project:
+            return "Error: Missing required parameter (project)"
+
         return manager.add_to_deferred(
             text=text,
-            project=params.get("project"),
+            project=project,
             defer=params.get("defer"),
             action_date=params.get("action_date")
         )
@@ -1246,7 +1251,7 @@ async def main():
             ),
             Tool(
                 name="add_to_deferred",
-                description="Add an item to the @deferred.md list. Use for actions that cannot be done now but will be actionable at a specific future date.",
+                description="Add an item to the @deferred.md list. Use for actions that cannot be done now but will be actionable at a specific future date. Requires a project to be specified.",
                 inputSchema={
                     "type": "object",
                     "properties": {
@@ -1256,7 +1261,7 @@ async def main():
                         },
                         "project": {
                             "type": "string",
-                            "description": "Optional project filename in kebab-case"
+                            "description": "Project filename in kebab-case (required)"
                         },
                         "defer": {
                             "type": "string",
@@ -1269,7 +1274,7 @@ async def main():
                             "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
                         }
                     },
-                    "required": ["text"]
+                    "required": ["text", "project"]
                 }
             ),
             Tool(

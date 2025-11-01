@@ -198,13 +198,17 @@ class ActionManager:
 
         Args:
             text: Action text
-            project: Optional project filename in kebab-case
+            project: Required project filename in kebab-case
             defer: Optional defer date (YYYY-MM-DD)
             action_date: Optional creation date (YYYY-MM-DD), defaults to today
 
         Returns:
             Success or error message
         """
+        # Validate that project is provided
+        if not project:
+            return "Error: Project is required for deferred items"
+
         return self.add_action(
             text=text,
             context="@deferred",

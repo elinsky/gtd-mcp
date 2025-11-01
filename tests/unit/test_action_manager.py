@@ -464,6 +464,47 @@ last_reviewed: 2025-10-20
         today = date.today().strftime("%Y-%m-%d")
         assert f"- [ ] {today} Action for later @deferred +future-project defer:2025-11-15" in content
 
+    def test_error_when_deferred_missing_project(self, tmp_path):
+        """
+        Test that adding to deferred without project returns error.
+
+        Given: @deferred.md exists
+        When: Adding item without project parameter
+        Then: Returns error about missing project
+        """
+        # Given
+        repo_path = tmp_path / "repo"
+        actions_dir = repo_path / "docs" / "execution_system" / "00k-next-actions"
+        actions_dir.mkdir(parents=True)
+
+        deferred_file = actions_dir / "@deferred.md"
+        deferred_file.write_text("""---
+title: Deferred
+last_reviewed: 2025-10-20
+---
+
+""")
+
+        config_file = tmp_path / "config.json"
+        config_file.write_text(json.dumps({
+            "execution_system_repo_path": str(repo_path),
+            "areas": [{"name": "Health", "kebab": "health"}]
+        }))
+
+        config = ConfigManager(str(config_file))
+        manager = ActionManager(config)
+
+        # When
+        result = manager.add_to_deferred(
+            text="Deferred action",
+            defer="2025-12-01"
+        )
+
+        # Then
+        assert "Error" in result
+        assert "project" in result.lower()
+        assert "required" in result.lower()
+
 
 class TestActionManagerAddToIncubating:
     """Test ActionManager add_to_incubating functionality."""
