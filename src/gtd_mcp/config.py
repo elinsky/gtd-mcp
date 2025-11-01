@@ -1,11 +1,11 @@
-"""Configuration management for GTD MCP server."""
+"""Configuration management for Execution System MCP server."""
 
 import json
 from pathlib import Path
 
 
 class ConfigManager:
-    """Manages GTD MCP server configuration."""
+    """Manages Execution System MCP server configuration."""
 
     def __init__(self, config_path: str | None = None) -> None:
         """
@@ -20,7 +20,7 @@ class ConfigManager:
             ValueError: If config is missing required fields or has invalid values
         """
         if config_path is None:
-            config_path = str(Path.home() / ".config" / "gtd-mcp" / "config.json")
+            config_path = str(Path.home() / ".config" / "execution-system-mcp" / "config.json")
 
         config_file = Path(config_path)
         if not config_file.exists():
@@ -49,10 +49,10 @@ class ConfigManager:
 
     def get_repo_path(self) -> str:
         """
-        Get GTD repository path from configuration.
+        Get execution system repository path from configuration.
 
         Returns:
-            Absolute path to GTD repository
+            Absolute path to execution system repository
         """
         return self._config["gtd_repo_path"]
 

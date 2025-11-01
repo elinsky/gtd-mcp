@@ -10,7 +10,7 @@ from gtd_mcp.templates import TemplateEngine
 
 
 class ProjectCreator:
-    """Creates GTD project files with frontmatter and templates."""
+    """Creates project files with frontmatter and templates."""
 
     def __init__(self, config: ConfigManager) -> None:
         """

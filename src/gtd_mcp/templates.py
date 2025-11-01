@@ -1,4 +1,4 @@
-"""Template generation for GTD projects."""
+"""Template generation for projects."""
 
 
 class TemplateEngine:

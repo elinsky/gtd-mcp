@@ -7,7 +7,7 @@ from gtd_mcp.config import ConfigManager
 
 
 class GoalLister:
-    """Lists GTD goals."""
+    """Lists goals."""
 
     def __init__(self, config: ConfigManager) -> None:
         """

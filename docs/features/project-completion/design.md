@@ -2,7 +2,7 @@
 
 ## 1. Overview
 
-The complete_project feature moves active GTD projects to the completed folder after validating that all associated 0k horizon work items have been processed. The design introduces a new `ProjectCompleter` class that orchestrates validation checks across multiple 0k files, updates YAML frontmatter, and performs the file move operation.
+The complete_project feature moves active projects to the completed folder after validating that all associated 0k horizon work items have been processed. The design introduces a new `ProjectCompleter` class that orchestrates validation checks across multiple 0k files, updates YAML frontmatter, and performs the file move operation.
 
 ## 2. Component Architecture & Data Flow
 
@@ -72,7 +72,7 @@ sequenceDiagram
 ```python
 {
     "name": "complete_project",
-    "description": "Complete an active GTD project by moving it to the completed folder after validating all 0k work is done",
+    "description": "Complete an active project by moving it to the completed folder after validating all 0k work is done",
     "inputSchema": {
         "type": "object",
         "properties": {

@@ -8,7 +8,7 @@ from gtd_mcp.config import ConfigManager
 
 
 class ActionLister:
-    """Lists and formats GTD actions."""
+    """Lists and formats actions."""
 
     def __init__(self, config: ConfigManager) -> None:
         """

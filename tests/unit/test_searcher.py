@@ -1,4 +1,4 @@
-"""Tests for GTD project and action search functionality."""
+"""Tests for project and action search functionality."""
 
 import json
 from pathlib import Path

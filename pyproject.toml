@@ -3,9 +3,9 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "gtd-mcp"
+name = "execution-system-mcp"
 version = "0.1.0"
-description = "MCP server for GTD project creation"
+description = "MCP server for project creation"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [

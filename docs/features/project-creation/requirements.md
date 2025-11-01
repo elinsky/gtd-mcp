@@ -1,14 +1,14 @@
-# Feature: GTD Project Creation
+# Feature: Project Creation
 
 **Status:** In Development
 
 ## 1. Business Context
 
-The GTD execution system manages projects across multiple horizons of focus (10k-projects level). Currently, project creation requires manual file creation with YAML frontmatter, markdown structure following the GTD Natural Planning Model, kebab-case filename generation, and validation of area/folder placement. This manual process is error-prone and time-consuming.
+The execution system manages projects across multiple horizons of focus (10k-projects level). Currently, project creation requires manual file creation with YAML frontmatter, markdown structure following the Natural Planning Model, kebab-case filename generation, and validation of area/folder placement. This manual process is error-prone and time-consuming.
 
-To streamline project creation and ensure consistency, the MCP server will provide a `create_project` tool that handles all aspects of project initialization. This enables Claude to create properly formatted projects with validated metadata, appropriate templates based on project type, and automatic placement in the correct folder structure. The MCP server is configurable to work with any GTD repository that follows this structure.
+To streamline project creation and ensure consistency, the MCP server will provide a `create_project` tool that handles all aspects of project initialization. This enables Claude to create properly formatted projects with validated metadata, appropriate templates based on project type, and automatic placement in the correct folder structure. The MCP server is configurable to work with any execution system repository that follows this structure.
 
-The system follows GTD's Natural Planning Model with these core sections:
+The system follows the Natural Planning Model with these core sections:
 
 1. **Purpose & Principles** - Why this matters and what standards apply
 2. **Vision/Outcome** - What success looks like
@@ -25,7 +25,7 @@ Three project types require templates:
 | ID                              | Requirement                                                                                                                                                                                                                                                                 |
 | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Core Functionality**          |                                                                                                                                                                                                                                                                             |
-| FR-1                            | **THE SYSTEM SHALL** provide a `create_project` MCP tool that creates GTD project files in the configured GTD repository.                                                                                                                                                   |
+| FR-1                            | **THE SYSTEM SHALL** provide a `create_project` MCP tool that creates project files in the configured execution system repository.                                                                                                                                                   |
 | FR-2                            | **WHEN** a user invokes `create_project` with required parameters,<br/>**THE SYSTEM SHALL** generate a project markdown file with YAML frontmatter and structured markdown body.                                                                                            |
 | FR-3                            | **THE** `create_project` tool SHALL require the following parameters: `title` (string), `area` (string), `type` (enum: standard, coordination, habit), and `folder` (enum: active, incubator).                                                                              |
 | FR-4                            | **THE** `create_project` tool SHALL accept the following optional parameters: `due` (ISO date string YYYY-MM-DD).                                                                                                                                                           |

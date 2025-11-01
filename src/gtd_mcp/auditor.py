@@ -8,7 +8,7 @@ from gtd_mcp.config import ConfigManager
 
 
 class Auditor:
-    """Audits GTD system for data quality and health."""
+    """Audits execution system for data quality and health."""
 
     def __init__(self, config: ConfigManager) -> None:
         """

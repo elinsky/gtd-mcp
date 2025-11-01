@@ -1,4 +1,4 @@
-"""GTD project completion functionality."""
+"""project completion functionality."""
 
 import re
 import yaml
@@ -9,7 +9,7 @@ from gtd_mcp.config import ConfigManager
 
 
 class ProjectCompleter:
-    """Handles completing GTD projects."""
+    """Handles completing projects."""
 
     def __init__(self, config: ConfigManager):
         """
@@ -234,7 +234,7 @@ class ProjectCompleter:
 
     def complete_project(self, title: str) -> str:
         """
-        Complete a GTD project.
+        Complete a project.
 
         Validates no open 0k items exist, then moves project from active/
         to completed/ folder with completed date added to frontmatter.

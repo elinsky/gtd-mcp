@@ -1,6 +1,6 @@
-# Tasks: GTD Project Creation
+# Tasks: Project Creation
 
-**Feature:** [GTD Project Creation](requirements.md)
+**Feature:** [Project Creation](requirements.md)
 **Status:** In Development
 
 ## 1. Project Setup and Configuration (TDD Cycle)
@@ -11,7 +11,7 @@
     *   Create `src/gtd_mcp/` directory structure
     *   Create `pyproject.toml` with dependencies: `mcp`, `pyyaml`, `pytest`, `pytest-mock`
     *   Create `README.md` with basic setup instructions
-*   **Location:** `/gtd-mcp/`
+*   **Location:** `/execution-system-mcp/`
 *   **Expected Outcome:** Project structure exists with installable package
 *   **Dependencies:** None
 
@@ -42,7 +42,7 @@
 ### Task: Commit ConfigManager Implementation
 
 *   [x] **Description:** Commit the ConfigManager implementation with tests
-*   **Commit Message:** `feat: implement ConfigManager for loading GTD repo configuration`
+*   **Commit Message:** `feat: implement ConfigManager for loading execution system repo configuration`
 *   **Dependencies:** Task 1.3
 
 ## 2. Validation Logic (TDD Cycle)
@@ -140,7 +140,7 @@
 ### Task: Commit Standard Template
 
 *   [ ] **Description:** Commit standard template implementation
-*   **Commit Message:** `feat: implement standard project template with GTD structure`
+*   **Commit Message:** `feat: implement standard project template with project structure`
 *   **Dependencies:** Task 3.2
 
 ### Task: Write Unit Tests for Habit Template
@@ -341,7 +341,7 @@
 ### Task: Create Example Configuration File
 
 *   [ ] **Description:** Create example configuration file with:
-    *   Placeholder GTD repo path
+    *   Placeholder execution system repo path
     *   All 11 areas with kebab-case mappings
     *   Comments explaining each field
 *   **Location:** `config.example.json`

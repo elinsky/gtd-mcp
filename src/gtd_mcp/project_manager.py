@@ -11,7 +11,7 @@ from gtd_mcp.config import ConfigManager
 
 
 class ProjectManager:
-    """Manages GTD project state transitions and updates."""
+    """Manages project state transitions and updates."""
 
     def __init__(self, config: ConfigManager) -> None:
         """

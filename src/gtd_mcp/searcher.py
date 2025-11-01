@@ -1,4 +1,4 @@
-"""GTD project and action search functionality."""
+"""project and action search functionality."""
 
 import re
 from pathlib import Path
@@ -9,7 +9,7 @@ from gtd_mcp.config import ConfigManager
 
 class Searcher:
     """
-    Search functionality for GTD projects and actions.
+    Search functionality for projects and actions.
 
     Provides text-based search across project files and action lists
     with various filtering options.

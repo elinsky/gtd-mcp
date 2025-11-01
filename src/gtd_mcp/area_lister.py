@@ -6,7 +6,7 @@ from gtd_mcp.config import ConfigManager
 
 
 class AreaLister:
-    """Lists GTD areas of focus."""
+    """Lists areas of focus."""
 
     def __init__(self, config: ConfigManager) -> None:
         """

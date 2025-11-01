@@ -1,23 +1,23 @@
-# GTD MCP Server
+# Execution System MCP Server
 
-An AI-native GTD (Getting Things Done) system powered by Claude and the Model Context Protocol.
+An AI-native execution system powered by Claude and the Model Context Protocol.
 
 ## Why This Exists
 
-Traditional GTD tools force you to context-switch between thinking and doing. You stop your work, open an app, navigate through menus, fill out forms, and then return to what you were doing. This friction means you often don't capture things at all, or you create incomplete entries that need cleanup later.
+Traditional productivity tools force you to context-switch between thinking and doing. You stop your work, open an app, navigate through menus, fill out forms, and then return to what you were doing. This friction means you often don't capture things at all, or you create incomplete entries that need cleanup later.
 
-This MCP server eliminates that friction. You stay in conversation with Claude while working, and your GTD system updates naturally:
+This MCP server eliminates that friction. You stay in conversation with Claude while working, and your execution system updates naturally:
 
 - **Working on code?** "Add action: refactor the auth module @macbook +api-redesign due:2025-11-15"
 - **In a meeting?** "Add to waiting: Sarah's feedback on the proposal"
 - **Reviewing your week?** "List all actions for the ml-refresh project"
 - **Planning?** "Show me all Health projects that haven't been reviewed in 7 days"
 
-No app switching. No form filling. Just natural language that keeps you in flow while maintaining a rigorous GTD system.
+No app switching. No form filling. Just natural language that keeps you in flow while maintaining a rigorous execution system.
 
 ## Features
 
-The server implements David Allen's GTD horizons through the Model Context Protocol:
+The server implements the horizons of focus model through the Model Context Protocol:
 
 ### 0k - Next Actions (Ground Level)
 - **Add actions** to context files (@macbook, @phone, @errands) with automatic project validation
@@ -51,8 +51,8 @@ All tools include comprehensive validation, error handling, and JSON output for 
 
 ```bash
 # Clone the repository
-git clone https://github.com/elinsky/gtd-mcp.git
-cd gtd-mcp
+git clone https://github.com/elinsky/execution-system-mcp.git
+cd execution-system-mcp
 
 # Install dependencies
 pip install -e ".[dev]"
@@ -60,11 +60,11 @@ pip install -e ".[dev]"
 
 ## Configuration
 
-Create a configuration file at `~/.config/gtd-mcp/config.json`:
+Create a configuration file at `~/.config/execution-system-mcp/config.json`:
 
 ```json
 {
-  "gtd_repo_path": "/absolute/path/to/your/gtd-repo",
+  "execution_system_repo_path": "/absolute/path/to/your/execution-system-repo",
   "areas": [
     {"name": "Health", "kebab": "health"},
     {"name": "Learning", "kebab": "learning"},
@@ -96,7 +96,7 @@ pytest tests/unit/test_config.py
 
 ## Usage
 
-The MCP server integrates with Claude Desktop. Once configured, you can manage your GTD system by asking Claude:
+The MCP server integrates with Claude Desktop. Once configured, you can manage your execution system by asking Claude:
 
 ### 0k - Action Examples
 - "Add action 'Buy groceries' to @errands context for project meal-planning"
@@ -117,7 +117,7 @@ The MCP server integrates with Claude Desktop. Once configured, you can manage y
 - "List all active goals"
 - "Show me goals in the incubator"
 
-Claude will use the appropriate MCP tools to interact with your GTD system.
+Claude will use the appropriate MCP tools to interact with your execution system.
 
 ## Available Tools
 
@@ -161,7 +161,7 @@ Claude will use the appropriate MCP tools to interact with your GTD system.
 ## Project Structure
 
 ```
-gtd-mcp/
+execution-system-mcp/
 ├── src/
 │   └── gtd_mcp/
 │       ├── __init__.py

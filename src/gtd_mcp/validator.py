@@ -1,4 +1,4 @@
-"""Validation logic for GTD project creation."""
+"""Validation logic for project creation."""
 
 import re
 from datetime import datetime

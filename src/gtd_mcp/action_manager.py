@@ -7,7 +7,7 @@ from gtd_mcp.config import ConfigManager
 
 
 class ActionManager:
-    """Manages GTD next actions."""
+    """Manages next actions."""
 
     def __init__(self, config: ConfigManager) -> None:
         """

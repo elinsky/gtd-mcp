@@ -2,7 +2,7 @@
 
 ## 1. Business Context
 
-When a GTD project is finished, it must be moved from the active folder to the completed folder. However, before completing a project, we need to ensure all work items at the 0k horizon (next actions, waiting for, incubating, deferred) have been processed. This prevents accidentally completing a project that still has open work associated with it.
+When a project is finished, it must be moved from the active folder to the completed folder. However, before completing a project, we need to ensure all work items at the 0k horizon (next actions, waiting for, incubating, deferred) have been processed. This prevents accidentally completing a project that still has open work associated with it.
 
 The complete_project MCP tool will validate that no open 0k items are tagged with the project, then move the project file to the completed folder and update its YAML frontmatter with a completion date.
 

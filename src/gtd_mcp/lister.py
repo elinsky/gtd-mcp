@@ -8,7 +8,7 @@ from gtd_mcp.config import ConfigManager
 
 
 class ProjectLister:
-    """Lists and formats GTD projects."""
+    """Lists and formats projects."""
 
     def __init__(self, config: ConfigManager) -> None:
         """

@@ -1,4 +1,4 @@
-"""MCP server for GTD project creation."""
+"""MCP server for project creation."""
 
 import json
 import os
@@ -790,12 +790,12 @@ def list_goals_handler(params: dict, config_path: str | None = None) -> str:
 
 async def main():
     """Run the MCP server."""
-    server = Server("gtd-mcp")
+    server = Server("execution-system-mcp")
 
     # Get config path from environment or use default
     config_path = os.environ.get("GTD_MCP_CONFIG")
     if not config_path:
-        config_path = str(Path.home() / ".config" / "gtd-mcp" / "config.json")
+        config_path = str(Path.home() / ".config" / "execution-system-mcp" / "config.json")
 
     @server.list_tools()
     async def list_tools() -> list[Tool]:
@@ -803,7 +803,7 @@ async def main():
         return [
             Tool(
                 name="create_project",
-                description="Create a new GTD project file with YAML frontmatter and structured markdown template",
+                description="Create a new project file with YAML frontmatter and structured markdown template",
                 inputSchema={
                     "type": "object",
                     "properties": {
@@ -836,7 +836,7 @@ async def main():
             ),
             Tool(
                 name="list_active_projects",
-                description="List all active GTD projects grouped by area of focus with due dates and type indicators",
+                description="List all active projects grouped by area of focus with due dates and type indicators",
                 inputSchema={
                     "type": "object",
                     "properties": {},
@@ -845,7 +845,7 @@ async def main():
             ),
             Tool(
                 name="complete_project",
-                description="Complete an active GTD project by moving it to the completed folder after validating all 0k work is done",
+                description="Complete an active project by moving it to the completed folder after validating all 0k work is done",
                 inputSchema={
                     "type": "object",
                     "properties": {
@@ -859,7 +859,7 @@ async def main():
             ),
             Tool(
                 name="list_projects",
-                description="List GTD projects with flexible filtering and grouping options. Returns JSON with project metadata including title, area, type, folder, due date, and filename.",
+                description="List projects with flexible filtering and grouping options. Returns JSON with project metadata including title, area, type, folder, due date, and filename.",
                 inputSchema={
                     "type": "object",
                     "properties": {
@@ -887,7 +887,7 @@ async def main():
             ),
             Tool(
                 name="list_actions",
-                description="List GTD next actions with flexible filtering and grouping options. Returns JSON with action metadata including text, date, context, project, due date, defer date, and state.",
+                description="List next actions with flexible filtering and grouping options. Returns JSON with action metadata including text, date, context, project, due date, defer date, and state.",
                 inputSchema={
                     "type": "object",
                     "properties": {

@@ -128,7 +128,7 @@ class TestProjectValidatorCheckDuplicates:
         """
         Test checking duplicates in empty repository.
 
-        Given: Empty GTD repository with no projects
+        Given: Empty execution system repository with no projects
         When: Calling check_duplicates("test-project")
         Then: Returns (False, None)
         """

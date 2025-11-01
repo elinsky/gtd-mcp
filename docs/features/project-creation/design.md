@@ -1,13 +1,13 @@
-# Design: GTD Project Creation
+# Design: Project Creation
 
-**Feature:** [GTD Project Creation](requirements.md)
+**Feature:** [Project Creation](requirements.md)
 **Status:** In Development
 
 ## 1. Overview
 
-This document outlines the technical design for a Python-based MCP (Model Context Protocol) server that enables Claude to create GTD project files. The server provides a `create_project` tool that handles project initialization including YAML frontmatter generation, template selection based on project type, filename kebab-case conversion, area validation, and duplicate detection.
+This document outlines the technical design for a Python-based MCP (Model Context Protocol) server that enables Claude to create project files. The server provides a `create_project` tool that handles project initialization including YAML frontmatter generation, template selection based on project type, filename kebab-case conversion, area validation, and duplicate detection.
 
-The MCP server is built using the official `mcp` Python SDK from Anthropic and integrates with Claude Desktop. It is designed to be configurable for any GTD repository that follows the standard 10k-projects folder structure with areas of focus.
+The MCP server is built using the official `mcp` Python SDK from Anthropic and integrates with Claude Desktop. It is designed to be configurable for any execution system repository that follows the standard 10k-projects folder structure with areas of focus.
 
 Key capabilities:
 
@@ -69,7 +69,7 @@ sequenceDiagram
 
 *   **ConfigManager (`config.py`)**:
     *   Loads and validates the configuration file
-    *   Provides access to GTD repository path
+    *   Provides access to execution system repository path
     *   Provides access to configured areas of focus with kebab-case mappings
     *   Validates configuration schema on startup
 
@@ -103,7 +103,7 @@ The `create_project` tool is exposed via the MCP SDK with the following schema:
 ```python
 {
     "name": "create_project",
-    "description": "Create a new GTD project file with YAML frontmatter and structured markdown template",
+    "description": "Create a new project file with YAML frontmatter and structured markdown template",
     "inputSchema": {
         "type": "object",
         "properties": {
@@ -138,7 +138,7 @@ The `create_project` tool is exposed via the MCP SDK with the following schema:
 
 ### Configuration File Schema
 
-The MCP server requires a configuration file (JSON format) at a known location (e.g., `~/.config/gtd-mcp/config.json` or specified via environment variable):
+The MCP server requires a configuration file (JSON format) at a known location (e.g., `~/.config/execution-system-mcp/config.json` or specified via environment variable):
 
 ```python
 {
@@ -168,7 +168,7 @@ class ConfigManager:
         """Load config from path or default location"""
 
     def get_repo_path(self) -> str:
-        """Return absolute path to GTD repository"""
+        """Return absolute path to execution system repository"""
 
     def get_areas(self) -> list[dict[str, str]]:
         """Return list of area definitions with name and kebab mappings"""
@@ -271,7 +271,7 @@ The MCP server implements comprehensive error handling at multiple layers:
 
 *   **Invalid Repository Path**: When configured `gtd_repo_path` does not exist:
     *   Log error and fail MCP server startup
-    *   Return error: `"GTD repository not found at {path}"`
+    *   Return error: `"execution system repository not found at {path}"`
 
 *   **Permission Denied**: When the server cannot create directories or write files:
     *   Return error: `"Permission denied creating project at {path}"`
@@ -327,7 +327,7 @@ The testing strategy covers all core components with a focus on validation logic
 *   Generate coordination template with correct sections and title
 *   Generate habit template with status "Active" when folder is "active"
 *   Generate habit template with status "Incubating" when folder is "incubator"
-*   Verify all templates follow GTD Natural Planning Model structure
+*   Verify all templates follow Natural Planning Model structure
 
 **ProjectCreator Tests:**
 *   Convert title to kebab-case: "My Test Project!" → "my-test-project"
