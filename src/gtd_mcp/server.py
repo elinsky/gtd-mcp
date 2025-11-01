@@ -646,6 +646,96 @@ def add_action_handler(params: dict, config_path: str | None = None) -> str:
         return f"Error: {str(e)}"
 
 
+def add_to_waiting_handler(params: dict, config_path: str | None = None) -> str:
+    """
+    Handle add_to_waiting tool invocation.
+
+    Args:
+        params: Tool parameters (text, project?, due?, defer?, action_date?)
+        config_path: Optional path to config file (for testing)
+
+    Returns:
+        Success or error message
+    """
+    try:
+        config = ConfigManager(config_path)
+        manager = ActionManager(config)
+
+        text = params.get("text")
+        if not text:
+            return "Error: Missing required parameter (text)"
+
+        return manager.add_to_waiting(
+            text=text,
+            project=params.get("project"),
+            due=params.get("due"),
+            defer=params.get("defer"),
+            action_date=params.get("action_date")
+        )
+
+    except Exception as e:
+        return f"Error: {str(e)}"
+
+
+def add_to_deferred_handler(params: dict, config_path: str | None = None) -> str:
+    """
+    Handle add_to_deferred tool invocation.
+
+    Args:
+        params: Tool parameters (text, project?, defer?, action_date?)
+        config_path: Optional path to config file (for testing)
+
+    Returns:
+        Success or error message
+    """
+    try:
+        config = ConfigManager(config_path)
+        manager = ActionManager(config)
+
+        text = params.get("text")
+        if not text:
+            return "Error: Missing required parameter (text)"
+
+        return manager.add_to_deferred(
+            text=text,
+            project=params.get("project"),
+            defer=params.get("defer"),
+            action_date=params.get("action_date")
+        )
+
+    except Exception as e:
+        return f"Error: {str(e)}"
+
+
+def add_to_incubating_handler(params: dict, config_path: str | None = None) -> str:
+    """
+    Handle add_to_incubating tool invocation.
+
+    Args:
+        params: Tool parameters (text, project?, action_date?)
+        config_path: Optional path to config file (for testing)
+
+    Returns:
+        Success or error message
+    """
+    try:
+        config = ConfigManager(config_path)
+        manager = ActionManager(config)
+
+        text = params.get("text")
+        if not text:
+            return "Error: Missing required parameter (text)"
+
+        return manager.add_to_incubating(
+            text=text,
+            project=params.get("project"),
+            action_date=params.get("action_date")
+        )
+
+    except Exception as e:
+        return f"Error: {str(e)}"
+
+
 async def main():
     """Run the MCP server."""
     server = Server("gtd-mcp")
@@ -1063,6 +1153,90 @@ async def main():
                     },
                     "required": ["text", "context"]
                 }
+            ),
+            Tool(
+                name="add_to_waiting",
+                description="Add an item to the @waiting.md list. Use for things waiting on others or external events.",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "text": {
+                            "type": "string",
+                            "description": "Action text (without @waiting tag)"
+                        },
+                        "project": {
+                            "type": "string",
+                            "description": "Optional project filename in kebab-case"
+                        },
+                        "due": {
+                            "type": "string",
+                            "description": "Optional due date in ISO format YYYY-MM-DD",
+                            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                        },
+                        "defer": {
+                            "type": "string",
+                            "description": "Optional defer date in ISO format YYYY-MM-DD",
+                            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                        },
+                        "action_date": {
+                            "type": "string",
+                            "description": "Optional creation date in ISO format YYYY-MM-DD (defaults to today)",
+                            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                        }
+                    },
+                    "required": ["text"]
+                }
+            ),
+            Tool(
+                name="add_to_deferred",
+                description="Add an item to the @deferred.md list. Use for actions that cannot be done now but will be actionable at a specific future date.",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "text": {
+                            "type": "string",
+                            "description": "Action text (without @deferred tag)"
+                        },
+                        "project": {
+                            "type": "string",
+                            "description": "Optional project filename in kebab-case"
+                        },
+                        "defer": {
+                            "type": "string",
+                            "description": "Defer date in ISO format YYYY-MM-DD - when this becomes actionable",
+                            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                        },
+                        "action_date": {
+                            "type": "string",
+                            "description": "Optional creation date in ISO format YYYY-MM-DD (defaults to today)",
+                            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                        }
+                    },
+                    "required": ["text"]
+                }
+            ),
+            Tool(
+                name="add_to_incubating",
+                description="Add an item to the @incubating.md list. Use for ideas that might become projects or actions but need more thought.",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "text": {
+                            "type": "string",
+                            "description": "Action or idea text (without @incubating tag)"
+                        },
+                        "project": {
+                            "type": "string",
+                            "description": "Optional project filename in kebab-case"
+                        },
+                        "action_date": {
+                            "type": "string",
+                            "description": "Optional creation date in ISO format YYYY-MM-DD (defaults to today)",
+                            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                        }
+                    },
+                    "required": ["text"]
+                }
             )
         ]
 
@@ -1134,6 +1308,15 @@ async def main():
             return [TextContent(type="text", text=result)]
         elif name == "add_action":
             result = add_action_handler(arguments, config_path)
+            return [TextContent(type="text", text=result)]
+        elif name == "add_to_waiting":
+            result = add_to_waiting_handler(arguments, config_path)
+            return [TextContent(type="text", text=result)]
+        elif name == "add_to_deferred":
+            result = add_to_deferred_handler(arguments, config_path)
+            return [TextContent(type="text", text=result)]
+        elif name == "add_to_incubating":
+            result = add_to_incubating_handler(arguments, config_path)
             return [TextContent(type="text", text=result)]
         else:
             raise ValueError(f"Unknown tool: {name}")

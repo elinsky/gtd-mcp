@@ -56,13 +56,20 @@ class ActionManager:
         Get path to context file.
 
         Args:
-            context: Context tag (e.g., "@macbook")
+            context: Context tag (e.g., "@macbook", "@waiting")
 
         Returns:
             Path to context file
         """
         repo_path = Path(self._config.get_repo_path())
-        contexts_dir = repo_path / "docs" / "execution_system" / "00k-next-actions" / "contexts"
+        actions_base = repo_path / "docs" / "execution_system" / "00k-next-actions"
+
+        # Special state files are in the base actions directory
+        if context in ["@waiting", "@deferred", "@incubating"]:
+            return actions_base / f"{context}.md"
+
+        # Regular context files are in contexts subdirectory
+        contexts_dir = actions_base / "contexts"
         return contexts_dir / f"{context}.md"
 
     def add_action(
@@ -143,3 +150,85 @@ class ActionManager:
             f.writelines(lines)
 
         return f"✓ Successfully added action to {context}.md"
+
+    def add_to_waiting(
+        self,
+        text: str,
+        project: str | None = None,
+        due: str | None = None,
+        defer: str | None = None,
+        action_date: str | None = None
+    ) -> str:
+        """
+        Add an item to @waiting list.
+
+        Args:
+            text: Action text
+            project: Optional project filename in kebab-case
+            due: Optional due date (YYYY-MM-DD)
+            defer: Optional defer date (YYYY-MM-DD)
+            action_date: Optional creation date (YYYY-MM-DD), defaults to today
+
+        Returns:
+            Success or error message
+        """
+        result = self.add_action(
+            text=text,
+            context="@waiting",
+            project=project,
+            due=due,
+            defer=defer,
+            action_date=action_date
+        )
+        return result.replace("action to", "to")
+
+    def add_to_deferred(
+        self,
+        text: str,
+        project: str | None = None,
+        defer: str | None = None,
+        action_date: str | None = None
+    ) -> str:
+        """
+        Add an item to @deferred list.
+
+        Args:
+            text: Action text
+            project: Optional project filename in kebab-case
+            defer: Optional defer date (YYYY-MM-DD)
+            action_date: Optional creation date (YYYY-MM-DD), defaults to today
+
+        Returns:
+            Success or error message
+        """
+        return self.add_action(
+            text=text,
+            context="@deferred",
+            project=project,
+            defer=defer,
+            action_date=action_date
+        ).replace("action to @deferred.md", "to @deferred.md")
+
+    def add_to_incubating(
+        self,
+        text: str,
+        project: str | None = None,
+        action_date: str | None = None
+    ) -> str:
+        """
+        Add an item to @incubating list.
+
+        Args:
+            text: Action text
+            project: Optional project filename in kebab-case
+            action_date: Optional creation date (YYYY-MM-DD), defaults to today
+
+        Returns:
+            Success or error message
+        """
+        return self.add_action(
+            text=text,
+            context="@incubating",
+            project=project,
+            action_date=action_date
+        ).replace("action to @incubating.md", "to @incubating.md")

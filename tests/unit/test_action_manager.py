@@ -272,3 +272,199 @@ last_reviewed: 2025-10-20
         content = phone_file.read_text()
         assert "Call dentist @phone" in content
         assert "+" not in content  # No project tag
+
+
+class TestActionManagerAddToWaiting:
+    """Test ActionManager add_to_waiting functionality."""
+
+    def test_adds_to_waiting_file(self, tmp_path):
+        """
+        Test adding item to @waiting file.
+
+        Given: @waiting.md exists
+        When: Adding item with add_to_waiting
+        Then: Item added to top of file with @waiting context
+        """
+        # Given
+        repo_path = tmp_path / "repo"
+        actions_dir = repo_path / "docs" / "execution_system" / "00k-next-actions"
+        actions_dir.mkdir(parents=True)
+
+        waiting_file = actions_dir / "@waiting.md"
+        waiting_file.write_text("""---
+title: Waiting For
+last_reviewed: 2025-10-20
+---
+
+- [ ] 2025-10-20 Existing waiting item @waiting +existing-project
+""")
+
+        config_file = tmp_path / "config.json"
+        config_file.write_text(json.dumps({
+            "gtd_repo_path": str(repo_path),
+            "areas": [{"name": "Health", "kebab": "health"}]
+        }))
+
+        # Create dummy project for validation
+        projects_dir = repo_path / "docs" / "execution_system" / "10k-projects" / "active" / "health"
+        projects_dir.mkdir(parents=True)
+        (projects_dir / "receive-package.md").write_text("---\narea: Health\n---\n")
+
+        config = ConfigManager(str(config_file))
+        manager = ActionManager(config)
+
+        # When
+        result = manager.add_to_waiting(
+            text="Wait for package delivery",
+            project="receive-package"
+        )
+
+        # Then
+        assert "✓ Successfully added to @waiting.md" in result
+        content = waiting_file.read_text()
+        today = date.today().strftime("%Y-%m-%d")
+        expected = f"- [ ] {today} Wait for package delivery @waiting +receive-package"
+        assert expected in content
+
+    def test_adds_to_waiting_with_defer(self, tmp_path):
+        """
+        Test adding to waiting with defer date.
+
+        Given: @waiting.md exists
+        When: Adding item with defer date
+        Then: Item includes defer:YYYY-MM-DD tag
+        """
+        # Given
+        repo_path = tmp_path / "repo"
+        actions_dir = repo_path / "docs" / "execution_system" / "00k-next-actions"
+        actions_dir.mkdir(parents=True)
+
+        waiting_file = actions_dir / "@waiting.md"
+        waiting_file.write_text("""---
+title: Waiting For
+last_reviewed: 2025-10-20
+---
+
+""")
+
+        config_file = tmp_path / "config.json"
+        config_file.write_text(json.dumps({
+            "gtd_repo_path": str(repo_path),
+            "areas": [{"name": "Health", "kebab": "health"}]
+        }))
+
+        config = ConfigManager(str(config_file))
+        manager = ActionManager(config)
+
+        # When
+        result = manager.add_to_waiting(
+            text="Wait for delayed shipment",
+            defer="2025-12-01"
+        )
+
+        # Then
+        content = waiting_file.read_text()
+        assert "defer:2025-12-01" in content
+
+
+class TestActionManagerAddToDeferred:
+    """Test ActionManager add_to_deferred functionality."""
+
+    def test_adds_to_deferred_file(self, tmp_path):
+        """
+        Test adding item to @deferred file.
+
+        Given: @deferred.md exists
+        When: Adding item with add_to_deferred
+        Then: Item added to top of file with @deferred context
+        """
+        # Given
+        repo_path = tmp_path / "repo"
+        actions_dir = repo_path / "docs" / "execution_system" / "00k-next-actions"
+        actions_dir.mkdir(parents=True)
+
+        deferred_file = actions_dir / "@deferred.md"
+        deferred_file.write_text("""---
+title: Deferred
+last_reviewed: 2025-10-20
+---
+
+""")
+
+        config_file = tmp_path / "config.json"
+        config_file.write_text(json.dumps({
+            "gtd_repo_path": str(repo_path),
+            "areas": [{"name": "Health", "kebab": "health"}]
+        }))
+
+        # Create dummy project for validation
+        projects_dir = repo_path / "docs" / "execution_system" / "10k-projects" / "active" / "health"
+        projects_dir.mkdir(parents=True)
+        (projects_dir / "future-project.md").write_text("---\narea: Health\n---\n")
+
+        config = ConfigManager(str(config_file))
+        manager = ActionManager(config)
+
+        # When
+        result = manager.add_to_deferred(
+            text="Action for later",
+            defer="2025-11-15",
+            project="future-project"
+        )
+
+        # Then
+        assert "✓ Successfully added to @deferred.md" in result
+        content = deferred_file.read_text()
+        today = date.today().strftime("%Y-%m-%d")
+        assert f"- [ ] {today} Action for later @deferred +future-project defer:2025-11-15" in content
+
+
+class TestActionManagerAddToIncubating:
+    """Test ActionManager add_to_incubating functionality."""
+
+    def test_adds_to_incubating_file(self, tmp_path):
+        """
+        Test adding item to @incubating file.
+
+        Given: @incubating.md exists
+        When: Adding item with add_to_incubating
+        Then: Item added to top of file with @incubating context
+        """
+        # Given
+        repo_path = tmp_path / "repo"
+        actions_dir = repo_path / "docs" / "execution_system" / "00k-next-actions"
+        actions_dir.mkdir(parents=True)
+
+        incubating_file = actions_dir / "@incubating.md"
+        incubating_file.write_text("""---
+title: Incubating
+last_reviewed: 2025-10-20
+---
+
+""")
+
+        config_file = tmp_path / "config.json"
+        config_file.write_text(json.dumps({
+            "gtd_repo_path": str(repo_path),
+            "areas": [{"name": "Health", "kebab": "health"}]
+        }))
+
+        # Create dummy project for validation
+        projects_dir = repo_path / "docs" / "execution_system" / "10k-projects" / "active" / "health"
+        projects_dir.mkdir(parents=True)
+        (projects_dir / "experimental-idea.md").write_text("---\narea: Health\n---\n")
+
+        config = ConfigManager(str(config_file))
+        manager = ActionManager(config)
+
+        # When
+        result = manager.add_to_incubating(
+            text="Maybe someday explore this",
+            project="experimental-idea"
+        )
+
+        # Then
+        assert "✓ Successfully added to @incubating.md" in result
+        content = incubating_file.read_text()
+        today = date.today().strftime("%Y-%m-%d")
+        assert f"- [ ] {today} Maybe someday explore this @incubating +experimental-idea" in content
