@@ -9,6 +9,7 @@ from mcp.server.stdio import stdio_server
 from mcp.types import TextContent, Tool
 
 from gtd_mcp.action_lister import ActionLister
+from gtd_mcp.area_lister import AreaLister
 from gtd_mcp.auditor import Auditor
 from gtd_mcp.completer import ProjectCompleter
 from gtd_mcp.config import ConfigManager
@@ -590,6 +591,26 @@ def search_actions_handler(params: dict, config_path: str | None = None) -> str:
         return json.dumps({"error": str(e)}, indent=2)
 
 
+def list_areas_handler(params: dict, config_path: str | None = None) -> str:
+    """
+    Handle list_areas tool invocation.
+
+    Args:
+        params: Tool parameters (none)
+        config_path: Optional path to config file (for testing)
+
+    Returns:
+        JSON string with list of areas
+    """
+    try:
+        config = ConfigManager(config_path)
+        lister = AreaLister(config)
+        return lister.list_areas()
+
+    except Exception as e:
+        return json.dumps({"error": str(e)}, indent=2)
+
+
 async def main():
     """Run the MCP server."""
     server = Server("gtd-mcp")
@@ -961,6 +982,15 @@ async def main():
                     },
                     "required": ["query"]
                 }
+            ),
+            Tool(
+                name="list_areas",
+                description="List all configured areas of focus from config. Returns JSON with area names and kebab-case identifiers.",
+                inputSchema={
+                    "type": "object",
+                    "properties": {},
+                    "required": []
+                }
             )
         ]
 
@@ -1026,6 +1056,9 @@ async def main():
             return [TextContent(type="text", text=result)]
         elif name == "search_actions":
             result = search_actions_handler(arguments, config_path)
+            return [TextContent(type="text", text=result)]
+        elif name == "list_areas":
+            result = list_areas_handler(arguments, config_path)
             return [TextContent(type="text", text=result)]
         else:
             raise ValueError(f"Unknown tool: {name}")
