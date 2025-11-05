@@ -133,7 +133,7 @@ class TestProjectValidatorCheckDuplicates:
         Then: Returns (False, None)
         """
         # Given
-        repo_path = tmp_path / "gtd-repo"
+        repo_path = tmp_path / "execution-system-repo"
         repo_path.mkdir()
         projects_path = repo_path / "docs" / "execution_system" / "10k-projects"
         for folder in ["active", "incubator", "completed", "descoped"]:
@@ -164,7 +164,7 @@ class TestProjectValidatorCheckDuplicates:
         Then: Returns (True, "active")
         """
         # Given
-        repo_path = tmp_path / "gtd-repo"
+        repo_path = tmp_path / "execution-system-repo"
         projects_path = repo_path / "docs" / "execution_system" / "10k-projects"
         active_health = projects_path / "active" / "health"
         active_health.mkdir(parents=True)
@@ -198,7 +198,7 @@ class TestProjectValidatorCheckDuplicates:
         Then: Returns (True, "incubator")
         """
         # Given
-        repo_path = tmp_path / "gtd-repo"
+        repo_path = tmp_path / "execution-system-repo"
         projects_path = repo_path / "docs" / "execution_system" / "10k-projects"
         incubator_career = projects_path / "incubator" / "career"
         incubator_career.mkdir(parents=True)
@@ -232,7 +232,7 @@ class TestProjectValidatorCheckDuplicates:
         Then: Returns (True, "completed")
         """
         # Given
-        repo_path = tmp_path / "gtd-repo"
+        repo_path = tmp_path / "execution-system-repo"
         projects_path = repo_path / "docs" / "execution_system" / "10k-projects"
         completed_health = projects_path / "completed" / "health"
         completed_health.mkdir(parents=True)
@@ -266,7 +266,7 @@ class TestProjectValidatorCheckDuplicates:
         Then: Returns (True, "descoped")
         """
         # Given
-        repo_path = tmp_path / "gtd-repo"
+        repo_path = tmp_path / "execution-system-repo"
         projects_path = repo_path / "docs" / "execution_system" / "10k-projects"
         descoped_finance = projects_path / "descoped" / "finance"
         descoped_finance.mkdir(parents=True)
@@ -300,7 +300,7 @@ class TestProjectValidatorCheckDuplicates:
         Then: Returns (False, None)
         """
         # Given
-        repo_path = tmp_path / "gtd-repo"
+        repo_path = tmp_path / "execution-system-repo"
         projects_path = repo_path / "docs" / "execution_system" / "10k-projects"
         active_health = projects_path / "active" / "health"
         active_health.mkdir(parents=True)

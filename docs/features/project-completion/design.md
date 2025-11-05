@@ -45,7 +45,7 @@ sequenceDiagram
 
 ### Component Responsibilities
 
-**ProjectCompleter** (`src/gtd_mcp/completer.py`)
+**ProjectCompleter** (`src/execution_system_mcp/completer.py`)
 - `find_active_project(title: str) -> tuple[Path | None, str]` - Searches active subdirectories for project file, returns (path, area) or (None, error_msg)
 - `check_0k_blockers(project_kebab: str) -> list[dict]` - Scans all 0k files for open items tagged with project, returns list of blocking items with source file
 - `parse_frontmatter(file_path: Path) -> dict` - Parses YAML frontmatter and returns as dict

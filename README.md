@@ -163,7 +163,7 @@ Claude will use the appropriate MCP tools to interact with your execution system
 ```
 execution-system-mcp/
 ├── src/
-│   └── gtd_mcp/
+│   └── execution_system_mcp/
 │       ├── __init__.py
 │       ├── server.py          # MCP server with all tool handlers
 │       ├── config.py          # Configuration manager

@@ -142,7 +142,7 @@ The MCP server requires a configuration file (JSON format) at a known location (
 
 ```python
 {
-    "gtd_repo_path": "/absolute/path/to/gtd-repository",
+    "execution_system_repo_path": "/absolute/path/to/execution-system-repository",
     "areas": [
         {"name": "Health", "kebab": "health"},
         {"name": "Learning", "kebab": "learning"},
@@ -269,7 +269,7 @@ The MCP server implements comprehensive error handling at multiple layers:
 
 ### File System Errors
 
-*   **Invalid Repository Path**: When configured `gtd_repo_path` does not exist:
+*   **Invalid Repository Path**: When configured `execution_system_repo_path` does not exist:
     *   Log error and fail MCP server startup
     *   Return error: `"execution system repository not found at {path}"`
 
@@ -306,7 +306,7 @@ The testing strategy covers all core components with a focus on validation logic
 *   Load valid configuration file successfully
 *   Fail gracefully on missing configuration file
 *   Fail gracefully on invalid JSON format
-*   Fail gracefully on missing required fields (`gtd_repo_path`, `areas`)
+*   Fail gracefully on missing required fields (`execution_system_repo_path`, `areas`)
 *   Validate areas array is non-empty
 *   Case-insensitive area name lookup returns correct kebab value
 *   Return None for non-existent area names

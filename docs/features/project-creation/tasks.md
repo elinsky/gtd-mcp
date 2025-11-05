@@ -8,7 +8,7 @@
 ### Task: Create Project Structure and Dependencies
 
 *   [x] **Description:** Initialize the Python MCP server project structure with necessary directories and install dependencies.
-    *   Create `src/gtd_mcp/` directory structure
+    *   Create `src/execution_system_mcp/` directory structure
     *   Create `pyproject.toml` with dependencies: `mcp`, `pyyaml`, `pytest`, `pytest-mock`
     *   Create `README.md` with basic setup instructions
 *   **Location:** `/execution-system-mcp/`
@@ -35,7 +35,7 @@
     *   `get_repo_path() -> str`
     *   `get_areas() -> list[dict[str, str]]`
     *   `find_area_kebab(area_name: str) -> str | None`
-*   **Location:** `src/gtd_mcp/config.py`
+*   **Location:** `src/execution_system_mcp/config.py`
 *   **Expected Outcome:** All tests from Task 1.2 pass
 *   **Dependencies:** Task 1.2
 
@@ -60,7 +60,7 @@
 ### Task: Implement ProjectValidator Area Validation
 
 *   [x] **Description:** Implement `ProjectValidator` class with `validate_area()` method
-*   **Location:** `src/gtd_mcp/validator.py`
+*   **Location:** `src/execution_system_mcp/validator.py`
 *   **Expected Outcome:** All tests from Task 2.1 pass
 *   **Dependencies:** Task 2.1
 
@@ -86,7 +86,7 @@
 
 *   [x] **Description:** Implement `ProjectValidator.check_duplicates()` method with filesystem scanning
     *   Add TODO comment: "Future optimization - maintain an in-memory index of existing projects"
-*   **Location:** `src/gtd_mcp/validator.py`
+*   **Location:** `src/execution_system_mcp/validator.py`
 *   **Expected Outcome:** All tests from Task 2.4 pass
 *   **Dependencies:** Task 2.4
 
@@ -109,7 +109,7 @@
 ### Task: Implement Due Date Validation
 
 *   [x] **Description:** Implement `ProjectValidator.validate_due_date()` method
-*   **Location:** `src/gtd_mcp/validator.py`
+*   **Location:** `src/execution_system_mcp/validator.py`
 *   **Expected Outcome:** All tests from Task 2.7 pass
 *   **Dependencies:** Task 2.7
 
@@ -133,7 +133,7 @@
 ### Task: Implement Standard Template
 
 *   [ ] **Description:** Implement `TemplateEngine.generate_standard()` method
-*   **Location:** `src/gtd_mcp/templates.py`
+*   **Location:** `src/execution_system_mcp/templates.py`
 *   **Expected Outcome:** All tests from Task 3.1 pass
 *   **Dependencies:** Task 3.1
 
@@ -156,7 +156,7 @@
 ### Task: Implement Habit Template
 
 *   [ ] **Description:** Implement `TemplateEngine.generate_habit()` method
-*   **Location:** `src/gtd_mcp/templates.py`
+*   **Location:** `src/execution_system_mcp/templates.py`
 *   **Expected Outcome:** All tests from Task 3.4 pass
 *   **Dependencies:** Task 3.4
 
@@ -177,7 +177,7 @@
 ### Task: Implement Coordination Template
 
 *   [ ] **Description:** Implement `TemplateEngine.generate_coordination()` method
-*   **Location:** `src/gtd_mcp/templates.py`
+*   **Location:** `src/execution_system_mcp/templates.py`
 *   **Expected Outcome:** All tests from Task 3.7 pass
 *   **Dependencies:** Task 3.7
 
@@ -202,7 +202,7 @@
 ### Task: Implement Kebab-Case Conversion
 
 *   [ ] **Description:** Implement `ProjectCreator.to_kebab_case()` method
-*   **Location:** `src/gtd_mcp/creator.py`
+*   **Location:** `src/execution_system_mcp/creator.py`
 *   **Expected Outcome:** All tests from Task 4.1 pass
 *   **Dependencies:** Task 4.1
 
@@ -228,7 +228,7 @@
 ### Task: Implement YAML Frontmatter Generation
 
 *   [ ] **Description:** Implement `ProjectCreator.generate_frontmatter()` method with conditional field logic
-*   **Location:** `src/gtd_mcp/creator.py`
+*   **Location:** `src/execution_system_mcp/creator.py`
 *   **Expected Outcome:** All tests from Task 4.4 pass
 *   **Dependencies:** Task 4.4
 
@@ -255,7 +255,7 @@
     *   Use mocked filesystem for tests
     *   Create directories as needed
     *   Write complete file content
-*   **Location:** `src/gtd_mcp/creator.py`
+*   **Location:** `src/execution_system_mcp/creator.py`
 *   **Expected Outcome:** All tests from Task 4.7 pass
 *   **Dependencies:** Task 4.7
 
@@ -280,7 +280,7 @@
 ### Task: Implement MCP Server Tool Registration
 
 *   [ ] **Description:** Implement MCP server with `create_project` tool registration using `mcp` SDK
-*   **Location:** `src/gtd_mcp/server.py`
+*   **Location:** `src/execution_system_mcp/server.py`
 *   **Expected Outcome:** All tests from Task 5.1 pass
 *   **Dependencies:** Task 5.1
 
@@ -309,7 +309,7 @@
     *   Template generation
     *   Project creation
     *   Success/error message formatting
-*   **Location:** `src/gtd_mcp/server.py`
+*   **Location:** `src/execution_system_mcp/server.py`
 *   **Expected Outcome:** All tests from Task 5.4 pass
 *   **Dependencies:** Task 5.4
 

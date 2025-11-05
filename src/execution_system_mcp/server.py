@@ -803,7 +803,7 @@ async def main():
     server = Server("execution-system-mcp")
 
     # Get config path from environment or use default
-    config_path = os.environ.get("GTD_MCP_CONFIG")
+    config_path = os.environ.get("EXECUTION_SYSTEM_MCP_CONFIG")
     if not config_path:
         config_path = str(Path.home() / ".config" / "execution-system-mcp" / "config.json")
 
