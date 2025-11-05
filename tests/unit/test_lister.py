@@ -6,8 +6,8 @@ from pathlib import Path
 
 import pytest
 
-from gtd_mcp.config import ConfigManager
-from gtd_mcp.lister import ProjectLister
+from execution_system_mcp.config import ConfigManager
+from execution_system_mcp.lister import ProjectLister
 
 
 class TestProjectListerParseYaml:

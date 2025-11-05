@@ -2,7 +2,7 @@
 
 import pytest
 
-from gtd_mcp.templates import TemplateEngine
+from execution_system_mcp.templates import TemplateEngine
 
 
 class TestTemplateEngineGenerateStandard:

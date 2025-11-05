@@ -6,8 +6,8 @@ from pathlib import Path
 
 import pytest
 
-from gtd_mcp.action_manager import ActionManager
-from gtd_mcp.config import ConfigManager
+from execution_system_mcp.action_manager import ActionManager
+from execution_system_mcp.config import ConfigManager
 
 
 class TestActionManagerAddAction:

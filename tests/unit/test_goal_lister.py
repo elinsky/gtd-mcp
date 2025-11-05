@@ -5,8 +5,8 @@ from pathlib import Path
 
 import pytest
 
-from gtd_mcp.config import ConfigManager
-from gtd_mcp.goal_lister import GoalLister
+from execution_system_mcp.config import ConfigManager
+from execution_system_mcp.goal_lister import GoalLister
 
 
 class TestGoalListerListGoals:

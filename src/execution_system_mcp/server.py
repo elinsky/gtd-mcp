@@ -8,18 +8,18 @@ from mcp.server import Server
 from mcp.server.stdio import stdio_server
 from mcp.types import TextContent, Tool
 
-from gtd_mcp.action_lister import ActionLister
-from gtd_mcp.action_manager import ActionManager
-from gtd_mcp.area_lister import AreaLister
-from gtd_mcp.auditor import Auditor
-from gtd_mcp.completer import ProjectCompleter
-from gtd_mcp.config import ConfigManager
-from gtd_mcp.creator import ProjectCreator
-from gtd_mcp.goal_lister import GoalLister
-from gtd_mcp.lister import ProjectLister
-from gtd_mcp.project_manager import ProjectManager
-from gtd_mcp.searcher import Searcher
-from gtd_mcp.validator import ProjectValidator
+from execution_system_mcp.action_lister import ActionLister
+from execution_system_mcp.action_manager import ActionManager
+from execution_system_mcp.area_lister import AreaLister
+from execution_system_mcp.auditor import Auditor
+from execution_system_mcp.completer import ProjectCompleter
+from execution_system_mcp.config import ConfigManager
+from execution_system_mcp.creator import ProjectCreator
+from execution_system_mcp.goal_lister import GoalLister
+from execution_system_mcp.lister import ProjectLister
+from execution_system_mcp.project_manager import ProjectManager
+from execution_system_mcp.searcher import Searcher
+from execution_system_mcp.validator import ProjectValidator
 
 
 def create_project_handler(params: dict, config_path: str | None = None) -> str:

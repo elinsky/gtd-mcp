@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from gtd_mcp.server import create_project_handler
+from execution_system_mcp.server import create_project_handler
 
 
 class TestCreateProjectHandler:

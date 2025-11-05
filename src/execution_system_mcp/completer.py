@@ -5,7 +5,7 @@ import yaml
 from pathlib import Path
 from datetime import date
 
-from gtd_mcp.config import ConfigManager
+from execution_system_mcp.config import ConfigManager
 
 
 class ProjectCompleter:

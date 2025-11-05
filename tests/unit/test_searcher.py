@@ -5,8 +5,8 @@ from pathlib import Path
 
 import pytest
 
-from gtd_mcp.config import ConfigManager
-from gtd_mcp.searcher import Searcher
+from execution_system_mcp.config import ConfigManager
+from execution_system_mcp.searcher import Searcher
 
 
 class TestSearcherSearchProjects:

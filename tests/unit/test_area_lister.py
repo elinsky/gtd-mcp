@@ -5,8 +5,8 @@ from pathlib import Path
 
 import pytest
 
-from gtd_mcp.area_lister import AreaLister
-from gtd_mcp.config import ConfigManager
+from execution_system_mcp.area_lister import AreaLister
+from execution_system_mcp.config import ConfigManager
 
 
 class TestAreaListerListAreas:

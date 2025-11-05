@@ -6,8 +6,8 @@ from datetime import date
 from pathlib import Path
 from typing import Literal
 
-from gtd_mcp.completer import ProjectCompleter
-from gtd_mcp.config import ConfigManager
+from execution_system_mcp.completer import ProjectCompleter
+from execution_system_mcp.config import ConfigManager
 
 
 class ProjectManager:

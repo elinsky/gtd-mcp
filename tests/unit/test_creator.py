@@ -7,8 +7,8 @@ from pathlib import Path
 import pytest
 import yaml
 
-from gtd_mcp.config import ConfigManager
-from gtd_mcp.creator import ProjectCreator
+from execution_system_mcp.config import ConfigManager
+from execution_system_mcp.creator import ProjectCreator
 
 
 class TestProjectCreatorToKebabCase:

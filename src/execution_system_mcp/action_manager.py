@@ -3,7 +3,7 @@
 from datetime import date
 from pathlib import Path
 
-from gtd_mcp.config import ConfigManager
+from execution_system_mcp.config import ConfigManager
 
 
 class ActionManager:
