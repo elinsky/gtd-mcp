@@ -108,7 +108,7 @@ def list_projects_handler(params: dict, config_path: str | None = None) -> str:
     Handle list_projects tool invocation.
 
     Args:
-        params: Tool parameters (folder, group_by, filter_area, filter_has_due)
+        params: Tool parameters (folder, group_by, filter_area, filter_has_due, completed_date_preset, filter_completed_start, filter_completed_end)
         config_path: Optional path to config file (for testing)
 
     Returns:
@@ -126,13 +126,19 @@ def list_projects_handler(params: dict, config_path: str | None = None) -> str:
         group_by = params.get("group_by", "area")
         filter_area = params.get("filter_area")
         filter_has_due = params.get("filter_has_due")
+        completed_date_preset = params.get("completed_date_preset")
+        filter_completed_start = params.get("filter_completed_start")
+        filter_completed_end = params.get("filter_completed_end")
 
         # List projects
         result = lister.list_projects(
             folder=folder,
             group_by=group_by,
             filter_area=filter_area,
-            filter_has_due=filter_has_due
+            filter_has_due=filter_has_due,
+            completed_date_preset=completed_date_preset,
+            filter_completed_start=filter_completed_start,
+            filter_completed_end=filter_completed_end
         )
 
         # Return as JSON string
@@ -869,7 +875,7 @@ async def main():
             ),
             Tool(
                 name="list_projects",
-                description="List projects with flexible filtering and grouping options. Returns JSON with project metadata including title, area, type, folder, due date, and filename.",
+                description="List projects with flexible filtering and grouping options. Returns JSON with project metadata including title, area, type, folder, due date, completed date, started date, created date, and filename.",
                 inputSchema={
                     "type": "object",
                     "properties": {
@@ -890,6 +896,21 @@ async def main():
                         "filter_has_due": {
                             "type": "boolean",
                             "description": "Optional: filter to show only projects with due dates (true) or without due dates (false)"
+                        },
+                        "completed_date_preset": {
+                            "type": "string",
+                            "enum": ["last_week", "last_month", "week_to_date", "month_to_date", "quarter_to_date", "year_to_date"],
+                            "description": "Optional: filter completed projects by preset date range (week starts Sunday)"
+                        },
+                        "filter_completed_start": {
+                            "type": "string",
+                            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+                            "description": "Optional: custom start date for completed projects filter (YYYY-MM-DD), requires filter_completed_end"
+                        },
+                        "filter_completed_end": {
+                            "type": "string",
+                            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+                            "description": "Optional: custom end date for completed projects filter (YYYY-MM-DD), requires filter_completed_start"
                         }
                     },
                     "required": []

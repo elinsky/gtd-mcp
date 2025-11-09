@@ -10,6 +10,11 @@ from execution_system_mcp.config import ConfigManager
 from execution_system_mcp.lister import ProjectLister
 
 
+def get_week_start(d: date) -> date:
+    """Get the Sunday of the week containing the given date."""
+    return d - timedelta(days=d.weekday() + 1 if d.weekday() != 6 else 0)
+
+
 class TestProjectListerParseYaml:
     """Test ProjectLister YAML frontmatter parsing."""
 
@@ -685,3 +690,368 @@ type: standard
         # Should be sorted by title
         assert projects[0]["title"] == "Alpha Project"
         assert projects[1]["title"] == "Zebra Project"
+
+
+class TestProjectListerDateFields:
+    """Test parsing and returning date fields (completed, started, created)."""
+
+    def test_parse_completed_date(self, tmp_path):
+        """
+        Test parsing completed date from YAML.
+
+        Given: Completed project file with completed date
+        When: Calling parse_yaml_frontmatter()
+        Then: Returns dict with completed field
+        """
+        # Given
+        project_file = tmp_path / "completed-project.md"
+        project_file.write_text("""---
+area: Health
+title: Completed Project
+type: standard
+created: 2025-01-01
+started: 2025-01-15
+completed: 2025-10-31
+---
+""")
+
+        # When
+        result = ProjectLister.parse_yaml_frontmatter(project_file)
+
+        # Then
+        assert result["completed"] == "2025-10-31"
+        assert result["started"] == "2025-01-15"
+        assert result["created"] == "2025-01-01"
+
+    def test_parse_without_date_fields(self, tmp_path):
+        """
+        Test parsing when date fields are missing.
+
+        Given: Project file without completed/started/created
+        When: Calling parse_yaml_frontmatter()
+        Then: Returns dict with None for missing date fields
+        """
+        # Given
+        project_file = tmp_path / "project.md"
+        project_file.write_text("""---
+area: Health
+title: Simple Project
+type: standard
+---
+""")
+
+        # When
+        result = ProjectLister.parse_yaml_frontmatter(project_file)
+
+        # Then
+        assert result["completed"] is None
+        assert result["started"] is None
+        assert result["created"] is None
+
+    def test_list_projects_includes_date_fields(self, tmp_path):
+        """
+        Test that list_projects includes date fields in output.
+
+        Given: Completed projects with date fields
+        When: Calling list_projects(folder="completed")
+        Then: Returns projects with completed, started, created fields
+        """
+        # Given
+        repo_path = tmp_path / "repo"
+        completed_path = repo_path / "docs" / "execution_system" / "10k-projects" / "completed"
+
+        health_dir = completed_path / "health"
+        health_dir.mkdir(parents=True)
+        (health_dir / "project1.md").write_text("""---
+area: Health
+title: Completed Project 1
+type: standard
+created: 2025-01-01
+started: 2025-01-15
+completed: 2025-10-31
+---
+""")
+
+        config_file = tmp_path / "config.json"
+        config_data = {
+            "execution_system_repo_path": str(repo_path),
+            "areas": [{"name": "Health", "kebab": "health"}],
+        }
+        config_file.write_text(json.dumps(config_data))
+        config = ConfigManager(str(config_file))
+        lister = ProjectLister(config)
+
+        # When
+        result = lister.list_projects(folder="completed")
+
+        # Then
+        project = result["groups"][0]["projects"][0]
+        assert project["completed"] == "2025-10-31"
+        assert project["started"] == "2025-01-15"
+        assert project["created"] == "2025-01-01"
+
+
+class TestProjectListerCompletedDateFiltering:
+    """Test filtering completed projects by date ranges."""
+
+    def test_filter_completed_last_week(self, tmp_path):
+        """
+        Test filtering projects completed last week.
+
+        Given: Completed projects from various weeks
+        When: Calling list_projects(completed_date_preset="last_week")
+        Then: Returns only projects completed last Sunday-Saturday
+        """
+        # Given
+        repo_path = tmp_path / "repo"
+        completed_path = repo_path / "docs" / "execution_system" / "10k-projects" / "completed"
+        health_dir = completed_path / "health"
+        health_dir.mkdir(parents=True)
+
+        today = date.today()
+        # Get last week's Sunday and Saturday
+        this_week_start = get_week_start(today)
+        last_week_start = this_week_start - timedelta(days=7)
+        last_week_end = this_week_start - timedelta(days=1)
+
+        # Project completed last week (should be included)
+        (health_dir / "last-week.md").write_text(f"""---
+area: Health
+title: Last Week Project
+type: standard
+completed: {last_week_start + timedelta(days=2)}
+---
+""")
+
+        # Project completed this week (should NOT be included)
+        (health_dir / "this-week.md").write_text(f"""---
+area: Health
+title: This Week Project
+type: standard
+completed: {today}
+---
+""")
+
+        # Project completed two weeks ago (should NOT be included)
+        (health_dir / "two-weeks.md").write_text(f"""---
+area: Health
+title: Two Weeks Project
+type: standard
+completed: {last_week_start - timedelta(days=8)}
+---
+""")
+
+        config_file = tmp_path / "config.json"
+        config_data = {
+            "execution_system_repo_path": str(repo_path),
+            "areas": [{"name": "Health", "kebab": "health"}],
+        }
+        config_file.write_text(json.dumps(config_data))
+        config = ConfigManager(str(config_file))
+        lister = ProjectLister(config)
+
+        # When
+        result = lister.list_projects(folder="completed", completed_date_preset="last_week")
+
+        # Then
+        projects = result["groups"][0]["projects"]
+        assert len(projects) == 1
+        assert projects[0]["title"] == "Last Week Project"
+
+    def test_filter_completed_last_month(self, tmp_path):
+        """
+        Test filtering projects completed last month.
+
+        Given: Completed projects from various months
+        When: Calling list_projects(completed_date_preset="last_month")
+        Then: Returns only projects completed in previous calendar month
+        """
+        # Given
+        repo_path = tmp_path / "repo"
+        completed_path = repo_path / "docs" / "execution_system" / "10k-projects" / "completed"
+        health_dir = completed_path / "health"
+        health_dir.mkdir(parents=True)
+
+        today = date.today()
+        # Get last month's first and last day
+        first_of_this_month = today.replace(day=1)
+        last_month_last = first_of_this_month - timedelta(days=1)
+        last_month_first = last_month_last.replace(day=1)
+
+        # Project completed last month (should be included)
+        (health_dir / "last-month.md").write_text(f"""---
+area: Health
+title: Last Month Project
+type: standard
+completed: {last_month_first + timedelta(days=10)}
+---
+""")
+
+        # Project completed this month (should NOT be included)
+        (health_dir / "this-month.md").write_text(f"""---
+area: Health
+title: This Month Project
+type: standard
+completed: {today}
+---
+""")
+
+        config_file = tmp_path / "config.json"
+        config_data = {
+            "execution_system_repo_path": str(repo_path),
+            "areas": [{"name": "Health", "kebab": "health"}],
+        }
+        config_file.write_text(json.dumps(config_data))
+        config = ConfigManager(str(config_file))
+        lister = ProjectLister(config)
+
+        # When
+        result = lister.list_projects(folder="completed", completed_date_preset="last_month")
+
+        # Then
+        projects = result["groups"][0]["projects"]
+        assert len(projects) == 1
+        assert projects[0]["title"] == "Last Month Project"
+
+    def test_filter_completed_week_to_date(self, tmp_path):
+        """
+        Test filtering projects completed week-to-date.
+
+        Given: Completed projects from various times
+        When: Calling list_projects(completed_date_preset="week_to_date")
+        Then: Returns projects completed from Sunday through today (inclusive)
+        """
+        # Given
+        repo_path = tmp_path / "repo"
+        completed_path = repo_path / "docs" / "execution_system" / "10k-projects" / "completed"
+        health_dir = completed_path / "health"
+        health_dir.mkdir(parents=True)
+
+        today = date.today()
+        this_week_start = get_week_start(today)
+
+        # Project completed this week (should be included)
+        # Use a date that's guaranteed to be between week_start and today
+        days_into_week = (today - this_week_start).days
+        if days_into_week >= 1:
+            this_week_date = this_week_start + timedelta(days=1)
+        else:
+            # Today is Sunday, use today
+            this_week_date = today
+
+        (health_dir / "this-week.md").write_text(f"""---
+area: Health
+title: This Week Project
+type: standard
+completed: {this_week_date}
+---
+""")
+
+        # Project completed today (should be included)
+        (health_dir / "today.md").write_text(f"""---
+area: Health
+title: Today Project
+type: standard
+completed: {today}
+---
+""")
+
+        # Project completed last week (should NOT be included)
+        (health_dir / "last-week.md").write_text(f"""---
+area: Health
+title: Last Week Project
+type: standard
+completed: {this_week_start - timedelta(days=1)}
+---
+""")
+
+        config_file = tmp_path / "config.json"
+        config_data = {
+            "execution_system_repo_path": str(repo_path),
+            "areas": [{"name": "Health", "kebab": "health"}],
+        }
+        config_file.write_text(json.dumps(config_data))
+        config = ConfigManager(str(config_file))
+        lister = ProjectLister(config)
+
+        # When
+        result = lister.list_projects(folder="completed", completed_date_preset="week_to_date")
+
+        # Then
+        projects = result["groups"][0]["projects"]
+        assert len(projects) == 2
+        titles = {p["title"] for p in projects}
+        assert titles == {"This Week Project", "Today Project"}
+
+    def test_filter_completed_custom_range(self, tmp_path):
+        """
+        Test filtering projects with custom date range.
+
+        Given: Completed projects from various dates
+        When: Calling list_projects(filter_completed_start, filter_completed_end)
+        Then: Returns only projects completed within the range
+        """
+        # Given
+        repo_path = tmp_path / "repo"
+        completed_path = repo_path / "docs" / "execution_system" / "10k-projects" / "completed"
+        health_dir = completed_path / "health"
+        health_dir.mkdir(parents=True)
+
+        # Projects with different completion dates
+        (health_dir / "before.md").write_text("""---
+area: Health
+title: Before Range
+type: standard
+completed: 2025-09-30
+---
+""")
+        (health_dir / "in-range-1.md").write_text("""---
+area: Health
+title: In Range 1
+type: standard
+completed: 2025-10-01
+---
+""")
+        (health_dir / "in-range-2.md").write_text("""---
+area: Health
+title: In Range 2
+type: standard
+completed: 2025-10-15
+---
+""")
+        (health_dir / "in-range-3.md").write_text("""---
+area: Health
+title: In Range 3
+type: standard
+completed: 2025-10-31
+---
+""")
+        (health_dir / "after.md").write_text("""---
+area: Health
+title: After Range
+type: standard
+completed: 2025-11-01
+---
+""")
+
+        config_file = tmp_path / "config.json"
+        config_data = {
+            "execution_system_repo_path": str(repo_path),
+            "areas": [{"name": "Health", "kebab": "health"}],
+        }
+        config_file.write_text(json.dumps(config_data))
+        config = ConfigManager(str(config_file))
+        lister = ProjectLister(config)
+
+        # When - filter for October 2025
+        result = lister.list_projects(
+            folder="completed",
+            filter_completed_start="2025-10-01",
+            filter_completed_end="2025-10-31"
+        )
+
+        # Then
+        projects = result["groups"][0]["projects"]
+        assert len(projects) == 3
+        titles = {p["title"] for p in projects}
+        assert titles == {"In Range 1", "In Range 2", "In Range 3"}

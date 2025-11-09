@@ -1,6 +1,6 @@
 """Project listing functionality."""
 
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Literal
 
@@ -28,7 +28,7 @@ class ProjectLister:
             file_path: Path to project markdown file
 
         Returns:
-            Dict with area, title, type, due fields
+            Dict with area, title, type, due, completed, started, created fields
         """
         # Read first 10 lines (YAML frontmatter section)
         with open(file_path, 'r') as f:
@@ -38,7 +38,10 @@ class ProjectLister:
             "area": None,
             "title": None,
             "type": "standard",  # Default
-            "due": None
+            "due": None,
+            "completed": None,
+            "started": None,
+            "created": None
         }
 
         # Parse YAML fields
@@ -52,12 +55,80 @@ class ProjectLister:
                 result["type"] = line.split(":", 1)[1].strip()
             elif line.startswith("due:"):
                 result["due"] = line.split(":", 1)[1].strip()
+            elif line.startswith("completed:"):
+                result["completed"] = line.split(":", 1)[1].strip()
+            elif line.startswith("started:"):
+                result["started"] = line.split(":", 1)[1].strip()
+            elif line.startswith("created:"):
+                result["created"] = line.split(":", 1)[1].strip()
 
         # Use filename as title if not provided
         if not result["title"]:
             result["title"] = file_path.stem  # filename without .md
 
         return result
+
+    @staticmethod
+    def _get_week_start(d: date) -> date:
+        """Get the Sunday of the week containing the given date."""
+        # In Python, weekday() returns 0=Monday, 6=Sunday
+        # We want to get to Sunday
+        if d.weekday() == 6:  # Already Sunday
+            return d
+        else:
+            # Go back to previous Sunday
+            return d - timedelta(days=d.weekday() + 1)
+
+    @staticmethod
+    def _calculate_date_range(preset: str) -> tuple[date, date]:
+        """
+        Calculate start and end dates for preset ranges.
+
+        Args:
+            preset: Preset name (last_week, last_month, week_to_date, etc.)
+
+        Returns:
+            Tuple of (start_date, end_date) inclusive
+        """
+        today = date.today()
+
+        if preset == "last_week":
+            # Last Sunday-Saturday
+            this_week_start = ProjectLister._get_week_start(today)
+            last_week_start = this_week_start - timedelta(days=7)
+            last_week_end = this_week_start - timedelta(days=1)
+            return (last_week_start, last_week_end)
+
+        elif preset == "last_month":
+            # Previous calendar month
+            first_of_this_month = today.replace(day=1)
+            last_month_last = first_of_this_month - timedelta(days=1)
+            last_month_first = last_month_last.replace(day=1)
+            return (last_month_first, last_month_last)
+
+        elif preset == "week_to_date":
+            # Sunday through today
+            week_start = ProjectLister._get_week_start(today)
+            return (week_start, today)
+
+        elif preset == "month_to_date":
+            # First of month through today
+            month_start = today.replace(day=1)
+            return (month_start, today)
+
+        elif preset == "quarter_to_date":
+            # First of quarter through today
+            quarter_month = ((today.month - 1) // 3) * 3 + 1
+            quarter_start = today.replace(month=quarter_month, day=1)
+            return (quarter_start, today)
+
+        elif preset == "year_to_date":
+            # January 1 through today
+            year_start = today.replace(month=1, day=1)
+            return (year_start, today)
+
+        else:
+            raise ValueError(f"Unknown preset: {preset}")
 
     @staticmethod
     def format_due_date(due_date: str | None) -> str:
@@ -163,6 +234,9 @@ class ProjectLister:
         group_by: Literal["area", "due_date", "flat"] = "area",
         filter_area: str | None = None,
         filter_has_due: bool | None = None,
+        completed_date_preset: Literal["last_week", "last_month", "week_to_date", "month_to_date", "quarter_to_date", "year_to_date"] | None = None,
+        filter_completed_start: str | None = None,
+        filter_completed_end: str | None = None,
     ) -> dict:
         """
         List projects with flexible filtering and grouping.
@@ -172,6 +246,9 @@ class ProjectLister:
             group_by: How to group projects (default: "area")
             filter_area: Optional area filter (case-insensitive)
             filter_has_due: Optional filter for projects with due dates
+            completed_date_preset: Optional preset date range for completed projects
+            filter_completed_start: Optional custom start date for completed projects (YYYY-MM-DD)
+            filter_completed_end: Optional custom end date for completed projects (YYYY-MM-DD)
 
         Returns:
             Dict with structure:
@@ -186,6 +263,9 @@ class ProjectLister:
                                 "type": "habit",
                                 "folder": "active",
                                 "due": "2025-12-31",
+                                "completed": "2025-10-31",
+                                "started": "2025-01-15",
+                                "created": "2025-01-01",
                                 "filename": "morning-routine"
                             }
                         ]
@@ -227,9 +307,35 @@ class ProjectLister:
                         "type": metadata["type"],
                         "folder": folder_name,
                         "due": metadata["due"],
+                        "completed": metadata["completed"],
+                        "started": metadata["started"],
+                        "created": metadata["created"],
                         "filename": project_file.stem,
                     }
                     all_projects.append(project_data)
+
+        # Apply completed date filters
+        if completed_date_preset or (filter_completed_start and filter_completed_end):
+            # Determine date range
+            if completed_date_preset:
+                start_date, end_date = self._calculate_date_range(completed_date_preset)
+            else:
+                # Parse custom dates
+                start_date = datetime.strptime(filter_completed_start, "%Y-%m-%d").date()
+                end_date = datetime.strptime(filter_completed_end, "%Y-%m-%d").date()
+
+            # Filter projects by completed date
+            filtered_projects = []
+            for p in all_projects:
+                if p["completed"]:
+                    try:
+                        completed_date = datetime.strptime(p["completed"], "%Y-%m-%d").date()
+                        if start_date <= completed_date <= end_date:
+                            filtered_projects.append(p)
+                    except ValueError:
+                        # Invalid date format, skip
+                        continue
+            all_projects = filtered_projects
 
         # Apply filters
         if filter_area:
