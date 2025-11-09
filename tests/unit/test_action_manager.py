@@ -273,6 +273,105 @@ last_reviewed: 2025-10-20
         assert "Call dentist @phone" in content
         assert "+" not in content  # No project tag
 
+    def test_no_blank_line_after_yaml(self, tmp_path):
+        """
+        Test that no blank line exists after YAML when adding action.
+
+        Given: Context file with blank line after YAML
+        When: Adding action
+        Then: New action is placed immediately after YAML, no blank lines
+        """
+        # Given
+        repo_path = tmp_path / "repo"
+        contexts_dir = repo_path / "docs" / "execution_system" / "00k-next-actions" / "contexts"
+        contexts_dir.mkdir(parents=True)
+
+        macbook_file = contexts_dir / "@macbook.md"
+        macbook_file.write_text("""---
+title: Macbook
+last_reviewed: 2025-10-20
+---
+
+- [ ] 2025-10-20 Existing action @macbook
+""")
+
+        config_file = tmp_path / "config.json"
+        config_file.write_text(json.dumps({
+            "execution_system_repo_path": str(repo_path),
+            "areas": [{"name": "Health", "kebab": "health"}]
+        }))
+
+        config = ConfigManager(str(config_file))
+        manager = ActionManager(config)
+
+        # When
+        result = manager.add_action(
+            text="New action",
+            context="@macbook"
+        )
+
+        # Then
+        assert "✓ Successfully added action" in result
+        content = macbook_file.read_text()
+        lines = content.split('\n')
+
+        # Line 3 is closing ---
+        assert lines[3] == "---"
+        # Line 4 should be the new action, NO blank line
+        today = date.today().strftime("%Y-%m-%d")
+        assert lines[4] == f"- [ ] {today} New action @macbook"
+        # Line 5 should be the existing action
+        assert lines[5] == "- [ ] 2025-10-20 Existing action @macbook"
+
+    def test_removes_blank_lines_after_yaml(self, tmp_path):
+        """
+        Test that blank lines after YAML are removed when adding action.
+
+        Given: Context file with multiple blank lines after YAML
+        When: Adding action
+        Then: All blank lines removed, action placed immediately after YAML
+        """
+        # Given
+        repo_path = tmp_path / "repo"
+        contexts_dir = repo_path / "docs" / "execution_system" / "00k-next-actions" / "contexts"
+        contexts_dir.mkdir(parents=True)
+
+        macbook_file = contexts_dir / "@macbook.md"
+        # Two blank lines after YAML
+        macbook_file.write_text("""---
+title: Macbook
+last_reviewed: 2025-10-20
+---
+
+
+- [ ] 2025-10-20 Existing action @macbook
+""")
+
+        config_file = tmp_path / "config.json"
+        config_file.write_text(json.dumps({
+            "execution_system_repo_path": str(repo_path),
+            "areas": [{"name": "Health", "kebab": "health"}]
+        }))
+
+        config = ConfigManager(str(config_file))
+        manager = ActionManager(config)
+
+        # When
+        result = manager.add_action(
+            text="New action",
+            context="@macbook"
+        )
+
+        # Then
+        content = macbook_file.read_text()
+        lines = content.split('\n')
+
+        # Verify no blank lines between YAML and first action
+        assert lines[3] == "---"
+        today = date.today().strftime("%Y-%m-%d")
+        assert lines[4] == f"- [ ] {today} New action @macbook"
+        assert lines[5] == "- [ ] 2025-10-20 Existing action @macbook"
+
 
 class TestActionManagerAddToWaiting:
     """Test ActionManager add_to_waiting functionality."""
@@ -815,3 +914,61 @@ last_reviewed: 2025-10-20
         # Then
         assert "Error" in result
         assert "incomplete" in result.lower()
+
+    def test_complete_no_blank_line_in_completed_file(self, tmp_path):
+        """
+        Test that completing action doesn't add blank lines to completed.md.
+
+        Given: completed.md with blank line after YAML
+        When: Completing an action
+        Then: Completed action is placed immediately after YAML, no blank lines
+        """
+        # Given
+        repo_path = tmp_path / "repo"
+        contexts_dir = repo_path / "docs" / "execution_system" / "00k-next-actions" / "contexts"
+        contexts_dir.mkdir(parents=True)
+
+        macbook_file = contexts_dir / "@macbook.md"
+        macbook_file.write_text("""---
+title: Macbook
+last_reviewed: 2025-10-20
+---
+- [ ] 2025-10-15 Action to complete @macbook
+""")
+
+        actions_dir = repo_path / "docs" / "execution_system" / "00k-next-actions"
+        completed_file = actions_dir / "completed.md"
+        # completed.md has blank line after YAML
+        completed_file.write_text("""---
+title: Completed Actions
+last_reviewed: 2025-10-20
+---
+
+- [x] 2025-10-19 Old completed action @macbook
+""")
+
+        config_file = tmp_path / "config.json"
+        config_file.write_text(json.dumps({
+            "execution_system_repo_path": str(repo_path),
+            "areas": [{"name": "Health", "kebab": "health"}]
+        }))
+
+        config = ConfigManager(str(config_file))
+        manager = ActionManager(config)
+
+        # When
+        result = manager.complete_action(
+            file_path="contexts/@macbook.md",
+            line_number=5  # Line 5 is the action (no blank line after YAML)
+        )
+
+        # Then
+        assert "✓ Successfully completed action" in result
+        content = completed_file.read_text()
+        lines = content.split('\n')
+
+        # Verify no blank lines between YAML and first action
+        assert lines[3] == "---"
+        today = date.today().strftime("%Y-%m-%d")
+        assert lines[4] == f"- [x] {today} 2025-10-15 Action to complete @macbook"
+        assert lines[5] == "- [x] 2025-10-19 Old completed action @macbook"

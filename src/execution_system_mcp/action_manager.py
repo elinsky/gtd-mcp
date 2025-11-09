@@ -138,11 +138,11 @@ class ActionManager:
         action_line = " ".join(action_parts) + "\n"
 
         # Insert action at top of file (after YAML)
-        # Add empty line after YAML if not present
-        if yaml_end_idx < len(lines) and lines[yaml_end_idx].strip() != "":
-            lines.insert(yaml_end_idx, "\n")
-            yaml_end_idx += 1
+        # Remove any blank lines after YAML
+        while yaml_end_idx < len(lines) and lines[yaml_end_idx].strip() == "":
+            lines.pop(yaml_end_idx)
 
+        # Insert the new action immediately after YAML
         lines.insert(yaml_end_idx, action_line)
 
         # Write back to file
@@ -314,12 +314,11 @@ class ActionManager:
                     yaml_end_idx = i + 1
                     break
 
-        # Add empty line after YAML if not present
-        if yaml_end_idx < len(completed_lines) and completed_lines[yaml_end_idx].strip() != "":
-            completed_lines.insert(yaml_end_idx, "\n")
-            yaml_end_idx += 1
+        # Remove any blank lines after YAML
+        while yaml_end_idx < len(completed_lines) and completed_lines[yaml_end_idx].strip() == "":
+            completed_lines.pop(yaml_end_idx)
 
-        # Insert completed action at top of completed file
+        # Insert completed action at top of completed file (immediately after YAML)
         completed_lines.insert(yaml_end_idx, completed_line)
 
         # Write updated completed file
